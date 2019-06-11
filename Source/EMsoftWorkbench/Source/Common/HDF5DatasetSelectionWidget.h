@@ -47,6 +47,7 @@ class QtSLineEdit;
 class QKeyEvent;
 class QAction;
 class QTableWidget;
+class HDF5FileTreeModel;
 
 /**
  * @brief The HDF5DatasetSelectionWidget class
@@ -54,6 +55,8 @@ class QTableWidget;
 class HDF5DatasetSelectionWidget : public QWidget
 {
   Q_OBJECT
+
+  friend class ChangeHDF5FileCommand;
 
 public:
   HDF5DatasetSelectionWidget(QWidget* parent = nullptr);
@@ -147,6 +150,12 @@ protected:
   bool initWithFile(const QString& hdf5File);
 
   /**
+   * @brief setInputFilePath
+   * @param val
+   */
+  void setInputFilePath(const QString& val);
+
+  /**
   * @brief Returns the best guess at component dimensions for the given path.  This requires a valid AttributeMatrix, ImageGeometry, and HDF5 path
   * @param path
   * @return
@@ -154,16 +163,16 @@ protected:
   std::tuple<herr_t, QString> bestGuessCDims(const QString& path);
 
   /**
-   * @brief setValue
-   * @param val
-   */
-  void setValue(const QString& val);
-
-  /**
    * @brief getValue
    * @return
    */
   QString getValue();
+
+  /**
+   * @brief getModel
+   * @return
+   */
+  HDF5FileTreeModel* getModel() const;
 
   /**
    * @brief setErrorText
@@ -180,6 +189,8 @@ protected:
 signals:
   void parametersChanged();
   void selectedHDF5PathsChanged(QStringList selectedHDF5Paths);
+  void hdf5DatasetSelectionsAccepted();
+  void hdf5DatasetSelectionsRejected();
 
 private slots:
   /**

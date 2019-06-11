@@ -35,6 +35,8 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
 #include <QtCore/QVariant>
+
+#include <QtWidgets/QUndoStack>
 #include <QtWidgets/QFileIconProvider>
 
 #include <hdf5.h>
@@ -45,8 +47,11 @@ class HDF5FileTreeModel : public QAbstractItemModel
 {
   Q_OBJECT
 
+  friend class ChangeHDF5DatasetStateCommand;
+  friend class ChangeHDF5FileCommand;
+
 public:
-  HDF5FileTreeModel(hid_t fileId, QObject* parent = 0);
+  HDF5FileTreeModel(hid_t fileId, QObject* parent = nullptr);
   ~HDF5FileTreeModel() override;
 
   enum Roles
@@ -150,6 +155,17 @@ public:
    */
   void setOneSelectionOnly(bool value);
 
+public slots:
+  /**
+   * @brief acceptHDF5DatasetSelections
+   */
+  void acceptHDF5DatasetSelections();
+
+  /**
+   * @brief rejectHDF5DatasetSelections
+   */
+  void rejectHDF5DatasetSelections();
+
 signals:
   void selectedHDF5PathsChanged(QStringList selectedHDF5Paths);
 
@@ -159,6 +175,7 @@ private:
   QFileIconProvider m_IconProvider;
   QStringList m_SelectedHDF5Paths;
   bool m_OneSelectionOnly = false;
+  QUndoStack* m_UndoStack = nullptr;
 
   /**
    * @brief getItem

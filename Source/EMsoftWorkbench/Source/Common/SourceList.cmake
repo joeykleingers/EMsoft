@@ -60,6 +60,8 @@ set_source_files_properties( ${EMsoftWorkbench_${SUBDIR_NAME}_Generated_MOC_SRCS
 
 set(EMsoftWorkbench_${SUBDIR_NAME}_HDRS
   ${${SUBDIR_NAME}_DIR}/AbstractImageGenerator.hpp
+  ${${SUBDIR_NAME}_DIR}/ChangeHDF5DatasetStateCommand.h
+  ${${SUBDIR_NAME}_DIR}/ChangeHDF5FileCommand.h
   ${${SUBDIR_NAME}_DIR}/Constants.h
   ${${SUBDIR_NAME}_DIR}/EigenConversions.hpp
   ${${SUBDIR_NAME}_DIR}/FileIOTools.h
@@ -74,6 +76,8 @@ set(EMsoftWorkbench_${SUBDIR_NAME}_HDRS
 
 
 set(EMsoftWorkbench_${SUBDIR_NAME}_SRCS
+  ${${SUBDIR_NAME}_DIR}/ChangeHDF5DatasetStateCommand.cpp
+  ${${SUBDIR_NAME}_DIR}/ChangeHDF5FileCommand.cpp
   ${${SUBDIR_NAME}_DIR}/FileIOTools.cpp
   ${${SUBDIR_NAME}_DIR}/GLImageViewer.cpp
   ${${SUBDIR_NAME}_DIR}/PatternImageViewer.cpp

@@ -160,8 +160,9 @@ void HDF5DatasetSelectionWidget::readParameters(QJsonObject& obj)
   m_Ui->value->blockSignals(true);
 
   m_Ui->value->setText(widgetObj[ioConstants::HDF5DatasetSelectionInputFile].toString());
-  setValue(m_Ui->value->text());
-  parametersChanged();
+
+  setInputFilePath(m_Ui->value->text());
+  emit parametersChanged();
 
   m_Ui->value->blockSignals(false);
 }
@@ -239,8 +240,8 @@ void HDF5DatasetSelectionWidget::setupMenuField()
 // -----------------------------------------------------------------------------
 void HDF5DatasetSelectionWidget::listenFileEditingFinished()
 {
-  setValue(m_Ui->value->text());
-  parametersChanged();
+  setInputFilePath(m_Ui->value->text());
+  emit parametersChanged();
 }
 
 // -----------------------------------------------------------------------------
@@ -248,8 +249,8 @@ void HDF5DatasetSelectionWidget::listenFileEditingFinished()
 // -----------------------------------------------------------------------------
 void HDF5DatasetSelectionWidget::listenFileReturnPressed()
 {
-  setValue(m_Ui->value->text());
-  parametersChanged();
+  setInputFilePath(m_Ui->value->text());
+  emit parametersChanged();
 }
 
 // -----------------------------------------------------------------------------
@@ -288,7 +289,7 @@ void HDF5DatasetSelectionWidget::listenFileTextChanged(const QString& text)
     m_Ui->value->setToolTip("");
   }
 
-  parametersChanged();
+  emit parametersChanged();
 }
 
 // -----------------------------------------------------------------------------
@@ -296,8 +297,8 @@ void HDF5DatasetSelectionWidget::listenFileTextChanged(const QString& text)
 // -----------------------------------------------------------------------------
 void HDF5DatasetSelectionWidget::listenFileDropped(const QString& text)
 {
-  setValue(text);
-  parametersChanged();
+  setInputFilePath(text);
+  emit parametersChanged();
 }
 
 // -----------------------------------------------------------------------------
@@ -357,18 +358,9 @@ void HDF5DatasetSelectionWidget::listenSelectBtnClicked()
 
   file = QDir::toNativeSeparators(file);
 
-  if(initWithFile(file))
-  {
-    m_Ui->value->blockSignals(true);
-    m_Ui->value->setText(file);
-    m_Ui->value->blockSignals(false);
-  }
+  setInputFilePath(file);
 
   emit parametersChanged();
-
-  // Store the last used directory into the private instance variable
-  QFileInfo fi(file);
-  m_OpenDialogLastDirectory = fi.path();
 }
 
 // -----------------------------------------------------------------------------
@@ -410,7 +402,8 @@ void HDF5DatasetSelectionWidget::dropEvent(QDropEvent* e)
   {
     QDir parent(file);
     m_OpenDialogLastDirectory = parent.dirName();
-    initWithFile(file);
+
+    setInputFilePath(file);
     emit parametersChanged();
   }
 }
@@ -422,7 +415,7 @@ bool HDF5DatasetSelectionWidget::initWithFile(const QString& hdf5File)
 {
   // Delete the old model
   QAbstractItemModel* oldModel = m_Ui->hdfTreeView->model();
-  if (oldModel)
+  if (oldModel != nullptr)
   {
     delete oldModel;
     oldModel = nullptr;
@@ -470,9 +463,10 @@ bool HDF5DatasetSelectionWidget::initWithFile(const QString& hdf5File)
 
   // Get the HDF5FileTreeModel and set the Root Node
   HDF5FileTreeModel* treeModel = new HDF5FileTreeModel(m_FileId, m_Ui->hdfTreeView);
+  connect(this, &HDF5DatasetSelectionWidget::hdf5DatasetSelectionsAccepted, treeModel, &HDF5FileTreeModel::acceptHDF5DatasetSelections);
+  connect(this, &HDF5DatasetSelectionWidget::hdf5DatasetSelectionsRejected, treeModel, &HDF5FileTreeModel::rejectHDF5DatasetSelections);
   connect(treeModel, &HDF5FileTreeModel::selectedHDF5PathsChanged, this, &HDF5DatasetSelectionWidget::selectedHDF5PathsChanged);
   treeModel->setOneSelectionOnly(m_OneSelectionOnly);
-  connect(treeModel, SIGNAL(selectedHDF5PathsChanged()), this, SIGNAL(parametersChanged()));
   m_Ui->hdfTreeView->setModel(treeModel);
 #if defined(Q_OS_MAC)
   m_Ui->hdfTreeView->setAttribute(Qt::WA_MacShowFocusRect, false);
@@ -868,38 +862,13 @@ void HDF5DatasetSelectionWidget::calculatePrimeFactors(int n, QVector<int>& prim
   }
 }
 
-//// -----------------------------------------------------------------------------
-////
-//// -----------------------------------------------------------------------------
-//void HDF5DatasetSelectionWidget::filterNeedsInputParameters(AbstractFilter* filter)
-//{
-//  Q_UNUSED(filter)
-
-//  m_Filter->setHDF5FilePath(m_Ui->value->text());
-
-//  HDF5FileTreeModel* treeModel = dynamic_cast<HDF5FileTreeModel*>(m_Ui->hdfTreeView->model());
-//  if(treeModel != nullptr)
-//  {
-//    QStringList dsetPaths = treeModel->getSelectedHDF5Paths();
-//    QList<ImportHDF5Dataset::DatasetImportInfo> importInfoList;
-//    for(int i = 0; i < dsetPaths.size(); i++)
-//    {
-//      ImportHDF5Dataset::DatasetImportInfo importInfo;
-//      importInfo.dataSetPath = dsetPaths[i];
-//      importInfo.componentDimensions = m_ComponentDimsMap[dsetPaths[i]];
-//      importInfoList.push_back(importInfo);
-//    }
-//    m_Filter->setDatasetImportInfoList(importInfoList);
-//  }
-//}
-
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void HDF5DatasetSelectionWidget::setValue(const QString& text)
+void HDF5DatasetSelectionWidget::setInputFilePath(const QString& text)
 {
   QAbstractItemModel* oldModel = m_Ui->hdfTreeView->model();
-  if (oldModel)
+  if (oldModel != nullptr)
   {
     delete oldModel;
     oldModel = nullptr;
@@ -936,7 +905,15 @@ void HDF5DatasetSelectionWidget::setValue(const QString& text)
     m_OpenDialogLastDirectory = fi.path();
     setErrorText("");
   }
+  else
+  {
+    // Delete the  model
+    QAbstractItemModel* oldModel = m_Ui->hdfTreeView->model();
+    delete oldModel;
+  }
+
   emit parametersChanged();
+
   m_Ui->errorLabel->update();
 }
 
@@ -1004,4 +981,12 @@ QStringList HDF5DatasetSelectionWidget::getSelectedHDF5Paths() const
   }
 
   return hdf5Paths;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+HDF5FileTreeModel* HDF5DatasetSelectionWidget::getModel() const
+{
+  return dynamic_cast<HDF5FileTreeModel*>(m_Ui->hdfTreeView->model());
 }

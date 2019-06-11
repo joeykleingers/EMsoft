@@ -35,8 +35,9 @@
 
 #include "H5Support/H5Utilities.h"
 
-#include "HDF5FileTreeModel.h"
-#include "HDF5FileTreeModelItem.h"
+#include "Common/HDF5FileTreeModel.h"
+#include "Common/HDF5FileTreeModelItem.h"
+#include "Common/ChangeHDF5DatasetStateCommand.h"
 
 // -----------------------------------------------------------------------------
 //
@@ -46,6 +47,8 @@ HDF5FileTreeModel::HDF5FileTreeModel(hid_t fileId, QObject* parent)
 , m_FileId(fileId)
 {
   m_RootItem = new HDF5FileTreeModelItem(m_FileId, "HEADER");
+
+  m_UndoStack = new QUndoStack(this);
 }
 
 // -----------------------------------------------------------------------------
@@ -123,8 +126,6 @@ bool HDF5FileTreeModel::setData(const QModelIndex& index, const QVariant& value,
   if(role == Qt::CheckStateRole && !item->isGroup())
   {
     Qt::CheckState checkState = static_cast<Qt::CheckState>(value.toInt());
-    item->setCheckState(checkState);
-    QString hdf5Path = item->generateHDFPath();
     if(checkState == Qt::Checked)
     {
       if (m_OneSelectionOnly && !m_SelectedHDF5Paths.isEmpty())
@@ -133,18 +134,13 @@ bool HDF5FileTreeModel::setData(const QModelIndex& index, const QVariant& value,
         {
           QString selectedPath = m_SelectedHDF5Paths[0];
           QModelIndex selectedIndex = hdf5PathToIndex(selectedPath);
-          setData(selectedIndex, Qt::Unchecked, Qt::CheckStateRole);
+          m_UndoStack->push(new ChangeHDF5DatasetStateCommand(selectedIndex, Qt::Unchecked, this));
+          emit dataChanged(selectedIndex, selectedIndex);
         }
       }
-
-      m_SelectedHDF5Paths.push_back(hdf5Path);
-    }
-    else if(checkState == Qt::Unchecked)
-    {
-      m_SelectedHDF5Paths.removeAll(hdf5Path);
     }
 
-    emit selectedHDF5PathsChanged(m_SelectedHDF5Paths);
+    m_UndoStack->push(new ChangeHDF5DatasetStateCommand(index, checkState, this));
   }
   else if(role == Roles::HasErrorsRole)
   {
@@ -154,6 +150,28 @@ bool HDF5FileTreeModel::setData(const QModelIndex& index, const QVariant& value,
   emit dataChanged(index, index);
 
   return true;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void HDF5FileTreeModel::acceptHDF5DatasetSelections()
+{
+  m_UndoStack->clear();
+  emit selectedHDF5PathsChanged(m_SelectedHDF5Paths);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void HDF5FileTreeModel::rejectHDF5DatasetSelections()
+{
+  while (m_UndoStack->canUndo())
+  {
+    m_UndoStack->undo();
+  }
+
+  m_UndoStack->clear();
 }
 
 // -----------------------------------------------------------------------------

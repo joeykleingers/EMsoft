@@ -33,43 +33,69 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "ChoosePatternsDatasetDialog.h"
+#include "ChangeHDF5DatasetStateCommand.h"
+
+#include "Common/HDF5FileTreeModel.h"
+#include "Common/HDF5FileTreeModelItem.h"
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-ChoosePatternsDatasetDialog::ChoosePatternsDatasetDialog(QWidget* parent, Qt::WindowFlags flags)
-: QDialog(parent, flags)
-, m_Ui(new Ui::ChoosePatternsDatasetDialog())
+ChangeHDF5DatasetStateCommand::ChangeHDF5DatasetStateCommand(const QModelIndex &index, Qt::CheckState newState, HDF5FileTreeModel* model, QUndoCommand* parent)
+: QUndoCommand(parent)
+, m_Model(model)
+, m_ModelIndex(index)
+, m_OldState(qvariant_cast<Qt::CheckState>(index.data(Qt::CheckStateRole)))
+, m_NewState(newState)
 {
-  m_Ui->setupUi(this);
 
-  setupGui();
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-ChoosePatternsDatasetDialog::~ChoosePatternsDatasetDialog() = default;
+ChangeHDF5DatasetStateCommand::~ChangeHDF5DatasetStateCommand() = default;
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void ChoosePatternsDatasetDialog::setupGui()
+void ChangeHDF5DatasetStateCommand::redo()
 {
-  m_Ui->hdf5DatasetSelectionWidget->setInputFileLabelText("Pattern Data File");
-  m_Ui->hdf5DatasetSelectionWidget->setOneSelectionOnly(true);
+  HDF5FileTreeModelItem* item = static_cast<HDF5FileTreeModelItem*>(m_ModelIndex.internalPointer());
+  item->setCheckState(m_NewState);
 
-  connect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &ChoosePatternsDatasetDialog::accept);
-  connect(m_Ui->buttonBox, &QDialogButtonBox::rejected, this, &ChoosePatternsDatasetDialog::reject);
-  connect(this, &ChoosePatternsDatasetDialog::accepted, m_Ui->hdf5DatasetSelectionWidget, &HDF5DatasetSelectionWidget::hdf5DatasetSelectionsAccepted);
-  connect(this, &ChoosePatternsDatasetDialog::rejected, m_Ui->hdf5DatasetSelectionWidget, &HDF5DatasetSelectionWidget::hdf5DatasetSelectionsRejected);
+  QString hdf5Path = item->generateHDFPath();
+  if (m_NewState == Qt::Checked)
+  {
+    m_Model->m_SelectedHDF5Paths.push_back(hdf5Path);
+  }
+  else
+  {
+    m_Model->m_SelectedHDF5Paths.removeAll(hdf5Path);
+  }
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-HDF5DatasetSelectionWidget* ChoosePatternsDatasetDialog::getHDF5DatasetSelectionWidget() const
+void ChangeHDF5DatasetStateCommand::undo()
 {
-  return m_Ui->hdf5DatasetSelectionWidget;
+  HDF5FileTreeModelItem* item = static_cast<HDF5FileTreeModelItem*>(m_ModelIndex.internalPointer());
+  item->setCheckState(m_OldState);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+QPersistentModelIndex ChangeHDF5DatasetStateCommand::getModelIndex() const
+{
+  return m_ModelIndex;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void ChangeHDF5DatasetStateCommand::setModelIndex(const QPersistentModelIndex &value)
+{
+  m_ModelIndex = value;
 }

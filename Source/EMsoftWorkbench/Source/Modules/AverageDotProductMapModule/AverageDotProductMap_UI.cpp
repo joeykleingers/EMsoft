@@ -205,7 +205,10 @@ void AverageDotProductMap_UI::createWidgetConnections()
   connect(m_Ui->choosePatternsBtn, &QPushButton::clicked, m_ChoosePatternsDatasetDialog, &HDF5DatasetSelectionWidget::show);
 
   HDF5DatasetSelectionWidget* hdf5DsetSelectionWidget = m_ChoosePatternsDatasetDialog->getHDF5DatasetSelectionWidget();
-  connect(hdf5DsetSelectionWidget, &HDF5DatasetSelectionWidget::selectedHDF5PathsChanged, this, &AverageDotProductMap_UI::listenSelectedPatternDatasetChanged);
+  connect(hdf5DsetSelectionWidget, &HDF5DatasetSelectionWidget::selectedHDF5PathsChanged, [=] {
+    QStringList patternDSetPaths = hdf5DsetSelectionWidget->getSelectedHDF5Paths();
+    listenSelectedPatternDatasetChanged(patternDSetPaths);
+  });
 
   // Pass errors, warnings, and std output messages up to the user interface
   connect(m_Controller, &AverageDotProductMapController::errorMessageGenerated, this, &AverageDotProductMap_UI::notifyErrorMessage);

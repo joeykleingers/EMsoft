@@ -33,43 +33,40 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "ChoosePatternsDatasetDialog.h"
+#pragma once
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-ChoosePatternsDatasetDialog::ChoosePatternsDatasetDialog(QWidget* parent, Qt::WindowFlags flags)
-: QDialog(parent, flags)
-, m_Ui(new Ui::ChoosePatternsDatasetDialog())
+#include <QtCore/QPersistentModelIndex>
+
+#include <QtWidgets/QUndoCommand>
+
+class HDF5DatasetSelectionWidget;
+
+class ChangeHDF5FileCommand : public QUndoCommand
 {
-  m_Ui->setupUi(this);
+  public:
+    ChangeHDF5FileCommand(QString &oldFilePath, QString &newFilePath, HDF5DatasetSelectionWidget* widget, QUndoCommand* parent = nullptr);
 
-  setupGui();
-}
+    ~ChangeHDF5FileCommand() override;
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-ChoosePatternsDatasetDialog::~ChoosePatternsDatasetDialog() = default;
+    /**
+     * @brief redo
+     */
+    void redo() override;
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void ChoosePatternsDatasetDialog::setupGui()
-{
-  m_Ui->hdf5DatasetSelectionWidget->setInputFileLabelText("Pattern Data File");
-  m_Ui->hdf5DatasetSelectionWidget->setOneSelectionOnly(true);
+    /**
+     * @brief undo
+     */
+    void undo() override;
 
-  connect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &ChoosePatternsDatasetDialog::accept);
-  connect(m_Ui->buttonBox, &QDialogButtonBox::rejected, this, &ChoosePatternsDatasetDialog::reject);
-  connect(this, &ChoosePatternsDatasetDialog::accepted, m_Ui->hdf5DatasetSelectionWidget, &HDF5DatasetSelectionWidget::hdf5DatasetSelectionsAccepted);
-  connect(this, &ChoosePatternsDatasetDialog::rejected, m_Ui->hdf5DatasetSelectionWidget, &HDF5DatasetSelectionWidget::hdf5DatasetSelectionsRejected);
-}
+  private:
+    HDF5DatasetSelectionWidget* m_Widget;
+    QString m_OldFilePath;
+    QStringList m_OldDatasetPaths;
+    QString m_NewFilePath;
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-HDF5DatasetSelectionWidget* ChoosePatternsDatasetDialog::getHDF5DatasetSelectionWidget() const
-{
-  return m_Ui->hdf5DatasetSelectionWidget;
-}
+  public:
+    ChangeHDF5FileCommand(const ChangeHDF5FileCommand&) = delete;            // Copy Constructor Not Implemented
+    ChangeHDF5FileCommand(ChangeHDF5FileCommand&&) = delete;                 // Move Constructor Not Implemented
+    ChangeHDF5FileCommand& operator=(const ChangeHDF5FileCommand&) = delete; // Copy Assignment Not Implemented
+    ChangeHDF5FileCommand& operator=(ChangeHDF5FileCommand&&) = delete;      // Move Assignment Not Implemented
+};

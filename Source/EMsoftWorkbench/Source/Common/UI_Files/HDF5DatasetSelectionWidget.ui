@@ -201,6 +201,9 @@
                 <property name="columnCount">
                  <number>0</number>
                 </property>
+                <attribute name="horizontalHeaderVisible">
+                 <bool>false</bool>
+                </attribute>
                </widget>
               </item>
              </layout>
@@ -239,6 +242,9 @@
                 <property name="horizontalScrollMode">
                  <enum>QAbstractItemView::ScrollPerPixel</enum>
                 </property>
+                <attribute name="horizontalHeaderVisible">
+                 <bool>false</bool>
+                </attribute>
                </widget>
               </item>
              </layout>

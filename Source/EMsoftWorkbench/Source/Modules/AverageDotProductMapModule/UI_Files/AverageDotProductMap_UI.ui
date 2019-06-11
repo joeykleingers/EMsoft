@@ -515,7 +515,7 @@
          <item row="1" column="0">
           <widget class="QPushButton" name="choosePatternsBtn">
            <property name="text">
-            <string>Choose Patterns Dataset...</string>
+            <string>Choose Pattern Dataset...</string>
            </property>
           </widget>
          </item>
