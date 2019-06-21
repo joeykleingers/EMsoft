@@ -1536,6 +1536,257 @@ end subroutine EMsoftCEBSDDI
 
 ! !--------------------------------------------------------------------------
 ! !
+! ! SUBROUTINE:EMsoftCEBSDDI2
+! !
+! !> @author Marc De Graef, Carnegie Mellon University
+! !
+! !> @brief This subroutine can be called by a C/C++ program as a standalone function to perform dictionary indexing of experimental EBSD patterns
+! !
+! !> @details This subroutine provides a method to index experimental EBSD patterns and
+! !> can be called from an external C/C++ program; the routine provides a callback mechanism to
+! !> update the calling program about computational progress, as well as a cancel option.
+! !> The routine is intended to be called from a C/C++ program, e.g., EMsoftWorkbench.  This routine is a portion
+! !> of the core of the EMEBSDDI program. 
+! !>
+! !> @param ipar array with integer input parameters
+! !> @param fpar array with float input parameters
+! !> @param spar array with string input parameters
+! !> @param dpatterns dictionary pattern array (pre-processed)
+! !> @param epatterns experimental pattern array (pre-processed)
+! !> @param resultmain dot product array for top N matches
+! !> @param indexmain array with indices of matches into the euler angle array
+! !> @param cproc pointer to a C-function for the callback process
+! !> @param cerrorproc pointer to a C-function for the OpenCL error callback process
+! !> @param objAddress unique integer identifying the calling class in DREAM.3D
+! !> @param cancel character defined by DREAM.3D; when not equal to NULL (i.e., char(0)), the computation should be halted
+! !
+! !> @date 08/17/18 MDG 1.0 original extracted from EMEBSDDImem program
+! !--------------------------------------------------------------------------
+recursive subroutine EMsoftCEBSDDI2(ipar, fpar, spar, resultmain, indexmain, &
+                                   cproc, cerrorproc, objAddress, cancel) &
+          bind(c, name='EMsoftCEBSDDI2')    ! this routine is callable from a C/C++ program
+!DEC$ ATTRIBUTES DLLEXPORT :: EMsoftCEBSDDI2
+
+use local
+use typedefs
+use constants
+use configmod
+use dictmod
+use Indexingmod
+use error
+use io
+use others
+use clfortran
+use omp_lib
+use timing
+use ISO_C_BINDING
+
+! integers
+! ipar(6) : devid
+! ipar(7) : platid
+! ipar(18): nthreads
+! ipar(26): ipf_wd
+! ipar(27): ipf_ht
+! ipar(28): nregions
+! ipar(29): maskpattern
+! ipar(31): ROI1
+! ipar(32): ROI2
+! ipar(33): ROI3
+! ipar(34): ROI4
+! ipar(37): numexptsingle  (multiple of 16; number of expt patterns in one dot product chunk)
+! ipar(38): numdictsingle  (multiple of 16; number of dict patterns in one dot product chunk)
+! ipar(39): nnk (number of top matches to keep)
+! ipar(53): indexingmode
+! ipar(54): nosm
+! ipar(55): nism
+! ipar(56): ncubochoric
+! ipar(57): L (distance between scintillator and illumination point [microns])
+! ipar(58): numsx
+! ipar(59): numsy
+! ipar(60): energyaverage
+! ipar(62): binning (1, 2, 4, or 8)
+! ipar(63): keeptmpfile
+! ipar(64): multidevid(1)
+! ipar(65): multidevid(2)
+! ipar(66): multidevid(3)
+! ipar(67): multidevid(4)
+! ipar(68): multidevid(5)
+! ipar(69): multidevid(6)
+! ipar(70): multidevid(7)
+! ipar(71): multidevid(8)
+! ipar(72): usenumd
+
+
+! floats
+! fpar(2) : omega
+! fpar(20): beam current
+! fpar(21): dwelltime
+! fpar(22): gamma value
+! fpar(23): maskradius
+! fpar(24): hipasswd
+! fpar(28): stepX
+! fpar(29): stepY
+! fpar(30): isangle
+! fpar(31): thetac
+! fpar(32): delta
+! fpar(33): xpc
+! fpar(34): ypc
+! fpar(35): energymin
+! fpar(36): energymax
+
+! strings
+! spar(11):  EMNotify
+! spar(29):  maskfile
+! spar(30):  scalingmode
+! spar(31):  exptfile
+! spar(32):  HDFstrings(1)
+! spar(33):  HDFstrings(2)
+! spar(34):  HDFstrings(3)
+! spar(35):  HDFstrings(4)
+! spar(36):  HDFstrings(5)
+! spar(37):  HDFstrings(6)
+! spar(38):  HDFstrings(7)
+! spar(39):  HDFstrings(8)
+! spar(40):  HDFstrings(9)
+! spar(41):  HDFstrings(10)
+! spar(42):  tmpfile
+! spar(43):  datafile
+! spar(44):  ctffile
+! spar(45):  avctffile
+! spar(46):  angfile
+! spar(47):  eulerfile
+! spar(48):  dictfile
+! spar(49):  masterfile
+
+IMPLICIT NONE
+
+type(EBSDIndexingNameListType)                          :: dinl
+integer(c_int32_t),INTENT(IN)                           :: ipar(wraparraysize)
+real(kind=sgl),INTENT(IN)                               :: fpar(wraparraysize)
+character(kind=c_char, len=1), target, INTENT(IN)       :: spar(wraparraysize*fnlen)
+real(kind=sgl), allocatable, INTENT(INOUT)              :: resultmain(:,:)
+integer(c_int32_t), allocatable, INTENT(INOUT)          :: indexmain(:,:) 
+TYPE(C_FUNPTR), INTENT(IN), VALUE                       :: cproc
+TYPE(C_FUNPTR), INTENT(IN), VALUE                       :: cerrorproc
+integer(c_size_t),INTENT(IN), VALUE                     :: objAddress
+character(len=1),INTENT(IN)                             :: cancel
+
+PROCEDURE(ProgressCallBackDI3), POINTER                 :: proc
+PROCEDURE(OpenCLErrorCallBackDI2), POINTER              :: errorproc
+character(fnlen)                                        :: nmldeffile, progname
+integer(kind=irg)                                       :: totnumexpt
+integer(c_int32_t)                                      :: dim2
+
+! parameters to deal with the input string array spar
+type(ConfigStructureType)                               :: CS
+
+! link the proc procedure to the cproc argument
+nullify(proc, errorproc)
+CALL C_F_PROCPOINTER (cproc, proc)
+CALL C_F_PROCPOINTER (cerrorproc, errorproc)
+
+! the calling program passes a c-string array spar that we need to convert to the 
+! standard EMsoft config structure for use inside this routine
+call C2F_configuration_strings(C_LOC(spar), CS)
+
+! Copy the values into the EBSDIndexingNameListType structure
+dinl%devid = ipar(6)
+dinl%platid = ipar(7)
+dinl%nthreads = ipar(18)
+dinl%ipf_wd = ipar(26)
+dinl%ipf_ht = ipar(27)
+dinl%nregions = ipar(28)
+
+if (ipar(29).eq.1) then
+  dinl%maskpattern = 'y'
+else
+  dinl%maskpattern = 'n'
+endif
+
+dinl%ROI(1) = ipar(31)
+dinl%ROI(2) = ipar(32)
+dinl%ROI(3) = ipar(33)
+dinl%ROI(4) = ipar(34)
+dinl%numexptsingle = ipar(37)
+dinl%numdictsingle = ipar(38)
+dinl%nnk = ipar(39)
+
+dinl%nosm = ipar(54)
+dinl%nism = ipar(55)
+dinl%ncubochoric = ipar(56)
+dinl%L = ipar(57)
+dinl%numsx = ipar(58)
+dinl%numsy = ipar(59)
+dinl%energyaverage = ipar(60)
+dinl%binning = ipar(62)
+
+if (ipar(63).eq.1) then
+  dinl%keeptmpfile = 'y'
+else
+  dinl%keeptmpfile = 'n'
+endif
+
+dinl%multidevid(1) = ipar(64)
+dinl%multidevid(2) = ipar(65)
+dinl%multidevid(3) = ipar(66)
+dinl%multidevid(4) = ipar(67)
+dinl%multidevid(5) = ipar(68)
+dinl%multidevid(6) = ipar(69)
+dinl%multidevid(7) = ipar(70)
+dinl%multidevid(8) = ipar(71)
+dinl%usenumd = ipar(72)
+
+dinl%omega = fpar(2)
+dinl%beamcurrent = fpar(20)
+dinl%dwelltime = fpar(21)
+dinl%gammavalue = fpar(22)
+dinl%maskradius = fpar(23)
+dinl%hipassw = fpar(24)
+dinl%StepX = fpar(28)
+dinl%StepY = fpar(29)
+dinl%isangle = fpar(30)
+dinl%thetac = fpar(31)
+dinl%delta = fpar(32)
+dinl%xpc = fpar(33)
+dinl%ypc = fpar(34)
+dinl%energymin = fpar(35)
+dinl%energymax = fpar(36)
+
+dinl%Notify = CS%EMNotify
+dinl%maskfile = CS%maskfile
+dinl%scalingmode = CS%scalingmode
+dinl%exptfile = CS%exptfile
+dinl%HDFstrings(10) = CS%HDFstrings(10)
+dinl%tmpfile = CS%tmpfile
+dinl%datafile = CS%datafile
+dinl%ctffile = CS%ctffile
+dinl%avctffile = CS%avctffile
+dinl%angfile = CS%angfile
+dinl%eulerfile = CS%eulerfile
+dinl%dictfile = CS%dictfile
+dinl%masterfile = CS%masterfile
+dinl%indexingmode = CS%indexingmode
+
+nmldeffile = 'undefined'
+progname = 'EMsoftWorkbench'
+
+if (sum(dinl%ROI).ne.0) then
+  totnumexpt = dinl%ROI(3)*dinl%ROI(4)
+else
+  totnumexpt = dinl%ipf_wd*dinl%ipf_ht
+endif
+
+dim2 = dinl%numexptsingle*ceiling(float(totnumexpt)/float(dinl%numexptsingle))
+
+allocate (resultmain(dinl%nnk,dim2),indexmain(dinl%nnk,dim2))
+
+! perform the dictionary indexing computations
+call EBSDDISubroutine(dinl, progname, nmldeffile, resultmain, indexmain, dinl%nnk, dim2, proc, errorproc, objAddress, cancel)
+
+end subroutine EMsoftCEBSDDI2
+
+! !--------------------------------------------------------------------------
+! !
 ! ! SUBROUTINE:EMsoftCEBSDRefine
 ! !
 ! !> @author Marc De Graef, Carnegie Mellon University

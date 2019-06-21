@@ -84,8 +84,28 @@ void EMsoftCEBSDDIpreview
 */
 
 void EMsoftCEBSDDI
-	(size_t* ipar, float* fpar, char* spar, float* dpatterns, float* epatterns, 
-	 float* resultmain, size_t* indexmain, ProgCallBackTypeDI3 callback, ProgCallBackTypeError errorcallback,
+	(size_t* ipar, float* fpar, char* spar, float* resultmain, size_t* indexmain, 
+    ProgCallBackTypeDI3 callback, ProgCallBackTypeError errorcallback,
+     size_t object, bool* cancel); 
+
+/**
+* EBSD Dictionary indexing (all in ram) wrapper routine
+* @param ipar array with integer input parameters
+* @param fpar array with float input parameters
+* @param spar array with string input parameters
+* @param dpatterns array with pre-processed dictionary patterns
+* @param epatterns array with pre-processed experimental patterns
+* @param resultmain array with top N dot product values
+* @param indexmain array with euler angle indices for top N dot product values
+* @param callback callback routine to update progress bar
+* @param errorcallback callback routine to report OpenCL error code
+* @param object unique identifier for calling class instantiation
+* @param cancel boolean to trigger cancellation of computation
+*/
+
+void EMsoftCEBSDDI2
+	(size_t* ipar, float* fpar, char* spar, float* resultmain, size_t* indexmain, 
+    ProgCallBackTypeDI3 callback, ProgCallBackTypeError errorcallback,
      size_t object, bool* cancel); 
 
 /**

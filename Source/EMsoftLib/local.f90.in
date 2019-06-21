@@ -162,9 +162,22 @@ type ConfigStructureType
  character(fnlen)  :: Randomseedfilename
  character(1)      :: EMsoftnativedelimiter
  character(fnlen)  :: strvals(wraparraysize)
+ character(fnlen)  :: maskfile
+ character(fnlen)  :: scalingmode
+ character(fnlen)  :: exptfile
+ character(fnlen)  :: HDFStrings(10)
+ character(fnlen)  :: tmpfile
+ character(fnlen)  :: datafile
+ character(fnlen)  :: ctffile
+ character(fnlen)  :: avctffile
+ character(fnlen)  :: angfile
+ character(fnlen)  :: eulerfile
+ character(fnlen)  :: dictfile
+ character(fnlen)  :: masterfile
+ character(fnlen)  :: indexingmode
 end type ConfigStructureType
 
-character(30)      :: ConfigStructureNames(27) = (/ "EMsoftpathname                ", &
+character(30)      :: ConfigStructureNames(50) = (/ "EMsoftpathname                ", &
                                                     "EMXtalFolderpathname          ", &
                                                     "EMdatapathname                ", &
                                                     "EMtmppathname                 ", &
@@ -190,7 +203,30 @@ character(30)      :: ConfigStructureNames(27) = (/ "EMsoftpathname             
                                                     "Templatecodefilename          ", &
                                                     "WyckoffPositionsfilename      ", &
                                                     "Randomseedfilename            ", &
-                                                    "EMsoftnativedelimiter         " /)
+                                                    "EMsoftnativedelimiter         ", &
+                                                    "wraparraysize                 ", &
+                                                    "maskfile                      ", &
+                                                    "scalingmode                   ", &
+                                                    "exptfile                      ", &
+                                                    "HDFStrings(1)                 ", &
+                                                    "HDFStrings(2)                 ", &
+                                                    "HDFStrings(3)                 ", &
+                                                    "HDFStrings(4)                 ", &
+                                                    "HDFStrings(5)                 ", &
+                                                    "HDFStrings(6)                 ", &
+                                                    "HDFStrings(7)                 ", &
+                                                    "HDFStrings(8)                 ", &
+                                                    "HDFStrings(9)                 ", &
+                                                    "HDFStrings(10)                ", &
+                                                    "tmpfile                       ", &
+                                                    "datafile                      ", &
+                                                    "ctffile                       ", &
+                                                    "avctffile                     ", &
+                                                    "angfile                       ", &
+                                                    "eulerfile                     ", &
+                                                    "dictfile                      ", &
+                                                    "masterfile                    ", &
+                                                    "indexingmode                  " /)
 
 !
 contains

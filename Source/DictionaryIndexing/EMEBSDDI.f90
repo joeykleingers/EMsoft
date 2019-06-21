@@ -65,22 +65,21 @@ use HDFsupport
 
 IMPLICIT NONE
 
-character(fnlen)                            :: nmldeffile, progname, progdesc
-type(EBSDIndexingNameListType)              :: dinl
-type(MCCLNameListType)                      :: mcnl
-type(EBSDMasterNameListType)                :: mpnl
-type(EBSDNameListType)                      :: enl
-
-type(EBSDMCdataType)                        :: EBSDMCdata
-type(EBSDMPdataType)                        :: EBSDMPdata
-type(EBSDDetectorType)                      :: EBSDdetector
-logical                                     :: verbose
-integer(kind=irg)                           :: istat, res, hdferr
+character(fnlen)                              :: nmldeffile, progname, progdesc
+type(EBSDIndexingNameListType)                :: dinl
+integer(kind=irg)                             :: res
+real(kind=sgl), allocatable                   :: resultmain(:,:)
+integer(c_int32_t), allocatable               :: indexmain(:,:)
+PROCEDURE(ProgressCallBackDI3), POINTER       :: proc
+PROCEDURE(OpenCLErrorCallBackDI2), POINTER    :: errorproc
+integer(c_size_t)                             :: objAddress
+character(len=1)                              :: cancel
+integer(kind=irg)                             :: totnumexpt
+integer(c_int32_t)                            :: dim2
 
 nmldeffile = 'EMEBSDDI.nml'
 progname = 'EMEBSDDI.f90'
 progdesc = 'Program to index EBSD patterns using a dynamically calculated pattern dictionary'
-verbose = .TRUE.
 
 ! print some information
 call EMsoft(progname, progdesc)
@@ -97,46 +96,22 @@ else
   call GetEBSDIndexingNameList(nmldeffile,dinl)
 end if
 
-! is this a dynamic calculation (i.e., do we actually compute the EBSD patterns)?
-if (trim(dinl%indexingmode).eq.'dynamic') then 
+if (sum(dinl%ROI).ne.0) then
+  totnumexpt = dinl%ROI(3)*dinl%ROI(4)
+else
+  totnumexpt = dinl%ipf_wd*dinl%ipf_ht
+endif
 
-    ! 1. read the Monte Carlo data file
-    call h5open_EMsoft(hdferr)
-    call readEBSDMonteCarloFile(dinl%masterfile, mcnl, hdferr, EBSDMCdata, getAccume=.TRUE.)
+dim2 = dinl%numexptsingle*ceiling(float(totnumexpt)/float(dinl%numexptsingle))
 
-    ! 2. read EBSD master pattern file
-    call readEBSDMasterPatternFile(dinl%masterfile, mpnl, hdferr, EBSDMPdata, getmLPNH=.TRUE., getmLPSH=.TRUE.)
-    call h5close_EMsoft(hdferr)
+allocate (resultmain(dinl%nnk,dim2),indexmain(dinl%nnk,dim2))
 
-    ! 3. allocate detector arrays
-    allocate(EBSDdetector%rgx(dinl%numsx,dinl%numsy), &
-           EBSDdetector%rgy(dinl%numsx,dinl%numsy), &
-           EBSDdetector%rgz(dinl%numsx,dinl%numsy), &
-           EBSDdetector%accum_e_detector(EBSDMCdata%numEbins,dinl%numsx,dinl%numsy), stat=istat)
-
-    ! 4. copy a few parameters from dinl to enl, which is the regular EBSDNameListType structure
-    ! and then generate the detector arrays
-    enl%numsx = dinl%numsx
-    enl%numsy = dinl%numsy
-    enl%xpc = dinl%xpc
-    enl%ypc = dinl%ypc
-    enl%delta = dinl%delta
-    enl%thetac = dinl%thetac
-    enl%L = dinl%L
-    enl%energymin = dinl%energymin
-    enl%energymax = dinl%energymax
-    call GenerateEBSDDetector(enl, mcnl, EBSDMCdata, EBSDdetector, verbose)
-
-    ! also copy the sample tilt angle into the correct variable for writing to the dot product file
-    dinl%MCsig = mcnl%sig
-else    ! this is a static run using an existing dictionary
-! we'll use the same MasterSubroutine so we need to at least allocate the input structures
-! even though we will not make use of them in static mode
-!  allocate(acc, master) 
-
-end if
+nullify(proc)
+nullify(errorproc)
+objAddress = -1
+cancel = 'n'
 
 ! perform the dictionary indexing computations
-call EBSDDISubroutine(dinl, mcnl, mpnl, EBSDMCdata, EBSDMPdata, EBSDdetector, progname, nmldeffile)
+call EBSDDISubroutine(dinl, progname, nmldeffile, resultmain, indexmain, dinl%nnk, dim2, proc, errorproc, objAddress, cancel)
 
 end program EMEBSDDI
