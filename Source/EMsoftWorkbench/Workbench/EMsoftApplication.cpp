@@ -54,7 +54,6 @@
 
 #include "Common/Constants.h"
 #include "Common/FileIOTools.h"
-#include "Workbench/SVStyle.h"
 
 #include "QtSupport/QtSFileUtils.h"
 #include "QtSupport/QtSRecentFileList.h"
@@ -63,6 +62,7 @@
 #include "EMsoftLib/EMsoftStringConstants.h"
 
 #include "EMsoftWorkbench_UI.h"
+#include "SVStyle.h"
 #include "StyleSheetEditor.h"
 
 // -----------------------------------------------------------------------------

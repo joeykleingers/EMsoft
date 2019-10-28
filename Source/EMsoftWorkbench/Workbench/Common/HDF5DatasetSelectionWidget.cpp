@@ -44,9 +44,8 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QFileDialog>
 
-#include "Common/HDF5FileTreeModel.h"
-#include "Workbench/SVStyle.h"
 #include "Common/Constants.h"
+#include "Common/HDF5FileTreeModel.h"
 
 #include "H5Support/QH5Lite.h"
 #include "H5Support/QH5Utilities.h"
@@ -54,7 +53,8 @@
 #include "QtSupport/QtSFileCompleter.h"
 #include "QtSupport/QtSFileUtils.h"
 
-#include "SIMPLib/Utilities/SIMPLDataPathValidator.h"
+#include "EMsoftWorkbench/SIMPLib/Utilities/SIMPLDataPathValidator.h"
+#include "SVStyle.h"
 
 namespace ioConstants = EMsoftWorkbenchConstants::IOStrings;
 

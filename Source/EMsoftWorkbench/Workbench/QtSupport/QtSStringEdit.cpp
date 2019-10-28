@@ -37,7 +37,7 @@
 
 #include <QtWidgets/QShortcut>
 
-#include "Workbench/SVStyle.h"
+#include "SVStyle.h"
 
 // -----------------------------------------------------------------------------
 //

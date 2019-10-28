@@ -50,10 +50,10 @@
 
 #include "EMsoftApplication.h"
 
-#include "Workbench/Common/Constants.h"
-#include "Workbench/Common/FileIOTools.h"
-#include "Workbench/Common/PatternTools.h"
-#include "Workbench/Modules/MasterPatternSimulationModule/MasterPatternSimulationController.h"
+#include "EMsoftWorkbench/Workbench/Common/Constants.h"
+#include "EMsoftWorkbench/Workbench/Common/FileIOTools.h"
+#include "EMsoftWorkbench/Workbench/Common/PatternTools.h"
+#include "EMsoftWorkbench/Workbench/Modules/MasterPatternSimulationModule/MasterPatternSimulationController.h"
 
 #include "QtSupport/QtSSettings.h"
 

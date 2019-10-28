@@ -50,12 +50,9 @@ INCLUDE (${CMP_SOURCE_DIR}/cmpProject.cmake)
 #-------------------------------------------------------------------------------
 # Set our H5Lite codes to also compile the Qt API version of H5Lite
 #-------------------------------------------------------------------------------
-set(H5Support_USE_QT 0)
-option(H5Support_INCLUDE_QT_API "Include support for using Qt classes with H5Lite" ON)
-if(H5Support_INCLUDE_QT_API)
-  set(H5Support_USE_QT 1)
+if(NOT DEFINED H5Support_USE_QT)
+  set(H5Support_USE_QT 0)
 endif()
-MARK_AS_ADVANCED(H5Support_INCLUDE_QT_API)
 MARK_AS_ADVANCED(H5Support_USE_QT)
 
 set(H5Support_SRCS
@@ -73,7 +70,10 @@ set(H5Support_HDRS
     ${H5Support_SOURCE_DIR}/H5Macros.h
 )
 
-if(H5Support_USE_QT)
+message(STATUS "H5Support_USE_QT: ${H5Support_USE_QT}")
+
+if(${H5Support_USE_QT})
+  message(STATUS "Including Qt classes!")
   set(H5Support_SRCS
     ${H5Support_SRCS}
     ${H5Support_SOURCE_DIR}/QH5Lite.cpp
@@ -115,7 +115,7 @@ cmp_IDE_SOURCE_PROPERTIES( "" "${H5Support_HDRS}" "${H5Support_SRCS}" ${PROJECT_
 set(PROJECT_SRCS
     ${H5Support_SRCS}
     ${H5Support_HDRS}
-    ${H5Support_BINARY_DIR}/${CMP_VERSION_SOURCE_FILE_NAME}
+    # ${H5Support_BINARY_DIR}/${CMP_VERSION_SOURCE_FILE_NAME}
 )
 
 include(GenerateExportHeader)
@@ -127,7 +127,12 @@ generate_export_header(${PROJECT_NAME}
   )
 CMP_AddDefinitions(TARGET ${PROJECT_NAME})
 LibraryProperties( ${PROJECT_NAME}  ${EXE_DEBUG_EXTENSION} )
-CMP_MODULE_INCLUDE_DIRS (TARGET ${PROJECT_NAME} LIBVARS HDF5 Qt5Core)
+
+set(include_dirs LIBVARS HDF5)
+if(H5Support_USE_QT)
+set(include_dirs ${include_dirs} Qt5Core)
+endif()
+CMP_MODULE_INCLUDE_DIRS (TARGET ${PROJECT_NAME} ${include_dirs})
 
 get_filename_component(TARGET_BINARY_DIR_PARENT ${H5Support_BINARY_DIR} PATH)
 get_filename_component(TARGET_SOURCE_DIR_PARENT ${H5Support_SOURCE_DIR} PATH)
@@ -159,7 +164,11 @@ if(BUILD_SHARED_LIBS)
   endif(WIN32)
 endif(BUILD_SHARED_LIBS)
 
-target_link_libraries(${PROJECT_NAME} ${EMSOFT_hdf5LinkLibs} Qt5::Core )
+set(link_libraries ${EMSOFT_hdf5LinkLibs})
+if(H5Support_USE_QT)
+set(link_libraries ${link_libraries} Qt5::Core)
+endif()
+target_link_libraries(${PROJECT_NAME} ${link_libraries})
 
 
 set(install_dir "bin")
@@ -209,7 +218,7 @@ if (H5Support_INSTALL_FILES)
       ${CMP_HEADER_DIR}/${CMP_TOP_HEADER_FILE}
       ${CMP_HEADER_DIR}/${CMP_TYPES_FILE_NAME}
       ${CMP_HEADER_DIR}/${CMP_CONFIGURATION_FILE_NAME}
-      ${CMP_HEADER_DIR}/${CMP_VERSION_HEADER_FILE_NAME}
+      # ${CMP_HEADER_DIR}/${CMP_VERSION_HEADER_FILE_NAME}
     DESTINATION
       include/${PROJECT_NAME}
   )

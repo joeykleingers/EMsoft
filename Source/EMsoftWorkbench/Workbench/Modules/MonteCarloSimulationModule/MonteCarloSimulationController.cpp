@@ -51,9 +51,9 @@
 
 #include "EMsoftLib/EMsoftStringConstants.h"
 
-#include "Workbench/Common/Constants.h"
-#include "Workbench/Common/EMsoftFileWriter.h"
-#include "Workbench/Common/FileIOTools.h"
+#include "Common/Constants.h"
+#include "Common/EMsoftFileWriter.h"
+#include "Common/FileIOTools.h"
 
 namespace ioConstants = EMsoftWorkbenchConstants::IOStrings;
 

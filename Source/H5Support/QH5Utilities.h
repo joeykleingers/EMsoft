@@ -45,14 +45,13 @@
 
 
 #include <QtCore/QString>
-#include <QtCore/QVector>
 #include <QtCore/QList>
 
 
 /**
  * @brief General Utilities for working with the HDF5 data files and API
  */
-class  QH5Utilities
+class QH5Utilities
 {
 
   public:

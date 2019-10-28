@@ -38,7 +38,7 @@
 #include <QtCore/QDebug>
 #include <QtWidgets/QDockWidget>
 
-#include "Workbench/SVStyle.h"
+#include "SVStyle.h"
 
 // -----------------------------------------------------------------------------
 //

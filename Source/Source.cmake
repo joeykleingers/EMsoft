@@ -57,6 +57,34 @@ endforeach()
 # -----------------------------------------------------------------------
 add_subdirectory(${PROJECT_SOURCE_DIR}/Source/EMsoftWrapperLib ${PROJECT_BINARY_DIR}/EMsoftWrapperLib)
 
+if( EMsoft_ENABLE_EMsoftWorkbench )
+
+  set(EMsoftWorkbench_Qt5_Components Core Widgets Network Gui Concurrent Svg Xml OpenGL PrintSupport )
+  # --------------------------------------------------------------------
+  # Find and Use the Qt5 Libraries
+  include(${EMsoft_SOURCE_DIR}/Support/cmp/ExtLib/Qt5Support.cmake)
+  CMP_AddQt5Support( "${EMsoftWorkbench_Qt5_Components}"
+                    "FALSE"
+                    "${EMsoft_BINARY_DIR}"
+                    "EMsoftWorkbench")
+  set(H5Support_USE_QT 1)
+endif()
+
+# -----------------------------------------------------------------------
+# Add H5Support library
+# -----------------------------------------------------------------------
+add_subdirectory( ${EMsoft_SOURCE_DIR}/Source/H5Support ${PROJECT_BINARY_DIR}/H5Support)
+
+# -----------------------------------------------------------------------
+# Does the developer want to compile the GUI for EMsoft?
+# -----------------------------------------------------------------------
+if( EMsoft_ENABLE_EMsoftWorkbench )
+
+  INCLUDE (${EMsoft_SOURCE_DIR}/Support/cmp/cmpCMakeMacros.cmake )
+  
+  include(${PROJECT_SOURCE_DIR}/Source/EMsoftWorkbench/SourceList.cmake)
+endif()
+
 # -----------------------------------------------------------------------
 # Add the executables
 # -----------------------------------------------------------------------
@@ -66,24 +94,4 @@ foreach(MODALITY ${MODALITY_DIRS})
     add_subdirectory( ${PROJECT_SOURCE_DIR}/Source/${MODALITY} ${PROJECT_BINARY_DIR}/${MODALITY})
   endif()
 endforeach()
-
-
-
-# -----------------------------------------------------------------------
-# Does the developer want to compile the GUI for EMsoft?
-# -----------------------------------------------------------------------
-if( EMsoft_ENABLE_EMsoftWorkbench )
-
-  INCLUDE (${EMsoft_SOURCE_DIR}/Support/cmp/cmpCMakeMacros.cmake )
-  # --------------------------------------------------------------------
-  # Find and Use the Qt5 Libraries
-  include(${EMsoft_SOURCE_DIR}/Support/cmp/ExtLib/Qt5Support.cmake)
-  set(EMsoftWorkbench_Qt5_Components Core Widgets Network Gui Concurrent Svg Xml OpenGL PrintSupport )
-  CMP_AddQt5Support( "${EMsoftWorkbench_Qt5_Components}"
-                    "FALSE"
-                    "${EMsoft_BINARY_DIR}"
-                    "EMsoftWorkbench")
-  
-  include(${PROJECT_SOURCE_DIR}/Source/EMsoftWorkbench/SourceList.cmake)
-endif()
 

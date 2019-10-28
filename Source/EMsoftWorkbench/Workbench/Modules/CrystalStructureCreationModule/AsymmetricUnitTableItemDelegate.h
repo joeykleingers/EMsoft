@@ -39,7 +39,7 @@
 
 #include <QStyledItemDelegate>
 
-#include "SIMPLib/Common/Constants.h"
+#include "EMsoftWorkbench/SIMPLib/Common/Constants.h"
 
 class AsymmetricUnitTableItemDelegate : public QStyledItemDelegate
 {

@@ -52,7 +52,7 @@
 
 #include "StyleSheetEditor.h"
 
-#include "Workbench/SVStyle.h"
+#include "EMsoftWorkbench/Workbench/SVStyle.h"
 
 // -----------------------------------------------------------------------------
 //

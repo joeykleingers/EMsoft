@@ -51,7 +51,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 
-#include "SIMPLib/Common/Constants.h"
+#include "EMsoftWorkbench/SIMPLib/Common/Constants.h"
 
 static QMap<QString, QImage> s_NameToImage;
 

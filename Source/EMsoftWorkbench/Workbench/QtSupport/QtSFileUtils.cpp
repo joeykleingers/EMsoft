@@ -39,7 +39,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMessageBox>
 
-#include "Workbench/SVStyle.h"
+#include "SVStyle.h"
 
 // -----------------------------------------------------------------------------
 //

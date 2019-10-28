@@ -46,8 +46,8 @@
 
 #include "EMsoftLib/EMsoftStringConstants.h"
 
-#include "Workbench/Common/EMsoftFileWriter.h"
-#include "Workbench/Common/FileIOTools.h"
+#include "Common/EMsoftFileWriter.h"
+#include "Common/FileIOTools.h"
 
 #include "H5Support/H5ScopedSentinel.h"
 #include "H5Support/QH5Utilities.h"

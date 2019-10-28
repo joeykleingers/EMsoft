@@ -50,11 +50,11 @@
 
 #include "EMsoftLib/EMsoftStringConstants.h"
 
-#include "Workbench/Common/Constants.h"
-#include "Workbench/Common/EMsoftFileWriter.h"
-#include "Workbench/Common/FileIOTools.h"
-#include "Workbench/Common/MonteCarloFileReader.h"
-#include "Workbench/Common/ProjectionConversions.hpp"
+#include "Common/Constants.h"
+#include "Common/EMsoftFileWriter.h"
+#include "Common/FileIOTools.h"
+#include "Common/MonteCarloFileReader.h"
+#include "Common/ProjectionConversions.hpp"
 
 #include "EMsoftWorkbenchVersion.h"
 
