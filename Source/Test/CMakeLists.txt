@@ -183,65 +183,110 @@ target_include_directories(DIWorkflowTestPrep PUBLIC ${EMsoft_BINARY_DIR}/Test)
 set(test_index  "1")
 set(EMsoft_NML_TEST_DIR "${EMsoft_BINARY_DIR}/DItutorial/Ni")
 file(MAKE_DIRECTORY ${EMsoft_NML_TEST_DIR})
-message(STATUS "Adding Unit Test: EMsoft_${test_index}_DIWorkflowTestPrep")
-add_test(NAME EMsoft_${test_index}_DIWorkflowTestPrep
-        COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/DIWorkflowTestPrep${EXE_EXT}
+# message(STATUS "Adding Unit Test: EMsoft_${test_index}_DIWorkflowTestPrep")
+# add_test(NAME EMsoft_${test_index}_DIWorkflowTestPrep
+#         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/DIWorkflowTestPrep${EXE_EXT}
+#         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
+#         )
+
+# #------------------------------------------------------------------------------
+# # 2: Setup the EMMCOpenCL executable
+# math(EXPR test_index "${test_index} + 1")
+# create_workflow_test( EXE_NAME EMMCOpenCL
+#                       INDEX ${test_index}
+#                       OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
+#                     )
+
+add_executable(EMMCOpenCLOutputTest EMMCOpenCLOutputTest.cpp H5FileComparison.h H5FileComparison.cpp ${EMsoft_BINARY_DIR}/Test/TestFileLocations.h)
+target_compile_features(EMMCOpenCLOutputTest PUBLIC cxx_std_11)
+target_include_directories(EMMCOpenCLOutputTest PUBLIC ${EMsoft_BINARY_DIR}/Test ${EMsoft_SOURCE_DIR}/Source/H5Support)
+target_link_libraries(EMMCOpenCLOutputTest PUBLIC H5Support)
+message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMMCOpenCLOutputTest")
+add_test(NAME EMsoft_${test_index}_EMMCOpenCLOutputTest
+        COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMMCOpenCLOutputTest${EXE_EXT} ${EMsoft_BINARY_DIR}/DItutorial/Ni/Ni-master-20kV.h5 ${EMsoftData_DIR}/DItutorial/Ni/Output/EMMCOpenCLOutput.h5
         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
         )
 
-#------------------------------------------------------------------------------
-# 2: Setup the EMMCOpenCL executable
-math(EXPR test_index "${test_index} + 1")
-create_workflow_test( EXE_NAME EMMCOpenCL
-                      INDEX ${test_index}
-                      OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
-                    )
+# #------------------------------------------------------------------------------
+# # 3: Setup the EMEBSDmaster executable
+# math(EXPR test_index "${test_index} + 1")
+# create_workflow_test( EXE_NAME EMEBSDmaster
+#                       INDEX ${test_index}
+#                       OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
+#                       EXTRA_NML BetheParameters.nml
+#                     )
 
+# message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDmasterOutputTest")
+# add_test(NAME EMsoft_${test_index}_EMEBSDmasterOutputTest
+#         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDmasterOutputTest${EXE_EXT}
+#         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
+#         )
 
-#------------------------------------------------------------------------------
-# 3: Setup the EMEBSDmaster executable
-math(EXPR test_index "${test_index} + 1")
-create_workflow_test( EXE_NAME EMEBSDmaster
-                      INDEX ${test_index}
-                      OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
-                      EXTRA_NML BetheParameters.nml
-                    )
-math(EXPR test_index "${test_index} + 1")
-create_workflow_test( EXE_NAME EMEBSD
-                      INDEX ${test_index}
-                      OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
-                    )
+# math(EXPR test_index "${test_index} + 1")
+# create_workflow_test( EXE_NAME EMEBSD
+#                       INDEX ${test_index}
+#                       OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
+#                     )
 
-#------------------------------------------------------------------------------
-# 4: Setup the ADP executable
-math(EXPR test_index "${test_index} + 1")
-create_workflow_test( EXE_NAME EMgetADP
-                      INDEX ${test_index}
-                      OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
-                    )
+# message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDOutputTest")
+# add_test(NAME EMsoft_${test_index}_EMEBSDOutputTest
+#         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDOutputTest${EXE_EXT}
+#         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
+#         )
 
-#------------------------------------------------------------------------------
-# 5: Setup the EMEBSDDIpreview executable
-math(EXPR test_index "${test_index} + 1")
-create_workflow_test( EXE_NAME EMEBSDDIpreview
-                      INDEX ${test_index}
-                      OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
-                    )
+# #------------------------------------------------------------------------------
+# # 4: Setup the ADP executable
+# math(EXPR test_index "${test_index} + 1")
+# create_workflow_test( EXE_NAME EMgetADP
+#                       INDEX ${test_index}
+#                       OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
+#                     )
 
+# message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMgetADPOutputTest")
+# add_test(NAME EMsoft_${test_index}_EMgetADPOutputTest
+#         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMgetADPOutputTest${EXE_EXT}
+#         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
+#         )
 
-#------------------------------------------------------------------------------
-# 6: Setup the EMEBSDDIpreview executable
-math(EXPR test_index "${test_index} + 1")
-create_workflow_test( EXE_NAME EMEBSDDI
-                      INDEX ${test_index}
-                      OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
-                    )
+# #------------------------------------------------------------------------------
+# # 5: Setup the EMEBSDDIpreview executable
+# math(EXPR test_index "${test_index} + 1")
+# create_workflow_test( EXE_NAME EMEBSDDIpreview
+#                       INDEX ${test_index}
+#                       OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
+#                     )
 
-#------------------------------------------------------------------------------
-# 7: Setup the EMFitOrientation executable
-math(EXPR test_index "${test_index} + 1")
-create_workflow_test( EXE_NAME EMFitOrientation
-                      INDEX ${test_index}
-                      OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
-                    )
+# message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDDIpreviewOutputTest")
+# add_test(NAME EMsoft_${test_index}_EMEBSDDIpreviewOutputTest
+#         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDDIpreviewOutputTest${EXE_EXT}
+#         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
+#         )
+
+# #------------------------------------------------------------------------------
+# # 6: Setup the EMEBSDDIpreview executable
+# math(EXPR test_index "${test_index} + 1")
+# create_workflow_test( EXE_NAME EMEBSDDI
+#                       INDEX ${test_index}
+#                       OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
+#                     )
+
+# message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDDIOutputTest")
+# add_test(NAME EMsoft_${test_index}_EMEBSDDIOutputTest
+#         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDDIOutputTest${EXE_EXT}
+#         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
+#         )
+
+# #------------------------------------------------------------------------------
+# # 7: Setup the EMFitOrientation executable
+# math(EXPR test_index "${test_index} + 1")
+# create_workflow_test( EXE_NAME EMFitOrientation
+#                       INDEX ${test_index}
+#                       OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
+#                     )
+
+# message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMFitOrientationOutputTest")
+# add_test(NAME EMsoft_${test_index}_EMFitOrientationOutputTest
+#         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMFitOrientationOutputTest${EXE_EXT}
+#         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
+#         )
 
