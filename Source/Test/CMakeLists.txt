@@ -197,13 +197,23 @@ file(MAKE_DIRECTORY ${EMsoft_NML_TEST_DIR})
 #                       OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
 #                     )
 
-add_executable(EMMCOpenCLOutputTest EMMCOpenCLOutputTest.cpp H5FileComparison.h H5FileComparison.cpp ${EMsoft_BINARY_DIR}/Test/TestFileLocations.h)
-target_compile_features(EMMCOpenCLOutputTest PUBLIC cxx_std_11)
-target_include_directories(EMMCOpenCLOutputTest PUBLIC ${EMsoft_BINARY_DIR}/Test ${EMsoft_SOURCE_DIR}/Source/H5Support)
-target_link_libraries(EMMCOpenCLOutputTest PUBLIC H5Support)
-message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMMCOpenCLOutputTest")
-add_test(NAME EMsoft_${test_index}_EMMCOpenCLOutputTest
-        COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMMCOpenCLOutputTest${EXE_EXT} ${EMsoft_BINARY_DIR}/DItutorial/Ni/Ni-master-20kV.h5 ${EMsoftData_DIR}/DItutorial/Ni/Output/EMMCOpenCLOutput.h5
+add_executable(EMMCOpenCLStructureTest EMMCOpenCLStructureTest.cpp H5StructureComparison.h H5StructureComparison.cpp ${EMsoft_BINARY_DIR}/Test/TestFileLocations.h)
+target_compile_features(EMMCOpenCLStructureTest PUBLIC cxx_std_11)
+target_include_directories(EMMCOpenCLStructureTest PUBLIC ${EMsoft_BINARY_DIR}/Test ${EMsoft_SOURCE_DIR}/Source/H5Support)
+target_link_libraries(EMMCOpenCLStructureTest PUBLIC H5Support)
+message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMMCOpenCLStructureTest")
+add_test(NAME EMsoft_${test_index}EMMCOpenCLStructureTest
+        COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMMCOpenCLStructureTest${EXE_EXT} ${EMsoft_BINARY_DIR}/DItutorial/Ni/Ni-master-20kV.h5 ${EMsoftData_DIR}/DItutorial/Ni/Output/Ni-master-20kV.h5
+        WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
+        )
+
+add_executable(EMMCOpenCLDataTest EMMCOpenCLDataTest.cpp H5DatasetComparison.h H5DatasetComparison.cpp ${EMsoft_BINARY_DIR}/Test/TestFileLocations.h)
+target_compile_features(EMMCOpenCLDataTest PUBLIC cxx_std_11)
+target_include_directories(EMMCOpenCLDataTest PUBLIC ${EMsoft_BINARY_DIR}/Test ${EMsoft_SOURCE_DIR}/Source/H5Support)
+target_link_libraries(EMMCOpenCLDataTest PUBLIC H5Support)
+message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMMCOpenCLDataTest")
+add_test(NAME EMsoft_${test_index}EMMCOpenCLDataTest
+        COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMMCOpenCLDataTest${EXE_EXT} ${EMsoft_BINARY_DIR}/DItutorial/Ni/Ni-master-20kV.h5 ${EMsoftData_DIR}/DItutorial/Ni/Output/Ni-master-20kV.h5
         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
         )
 
