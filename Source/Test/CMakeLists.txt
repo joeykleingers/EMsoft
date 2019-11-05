@@ -226,6 +226,26 @@ add_test(NAME EMsoft_${test_index}EMMCOpenCLDataTest
 #                       EXTRA_NML BetheParameters.nml
 #                     )
 
+add_executable(EMEBSDmasterStructureTest EMEBSDmasterStructureTest.cpp H5StructureComparison.h H5StructureComparison.cpp ${EMsoft_BINARY_DIR}/Test/TestFileLocations.h)
+target_compile_features(EMEBSDmasterStructureTest PUBLIC cxx_std_11)
+target_include_directories(EMEBSDmasterStructureTest PUBLIC ${EMsoft_BINARY_DIR}/Test ${EMsoft_SOURCE_DIR}/Source/H5Support)
+target_link_libraries(EMEBSDmasterStructureTest PUBLIC H5Support)
+message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDmasterStructureTest")
+add_test(NAME EMsoft_${test_index}EMEBSDmasterStructureTest
+        COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDmasterStructureTest${EXE_EXT} ${EMsoft_BINARY_DIR}/DItutorial/Ni/Ni-master-20kV.h5 ${EMsoftData_DIR}/DItutorial/Ni/Output/Ni-master-20kV.h5
+        WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
+        )
+
+add_executable(EMEBSDmasterDataTest EMEBSDmasterDataTest.cpp H5DatasetComparison.h H5DatasetComparison.cpp ${EMsoft_BINARY_DIR}/Test/TestFileLocations.h)
+target_compile_features(EMEBSDmasterDataTest PUBLIC cxx_std_11)
+target_include_directories(EMEBSDmasterDataTest PUBLIC ${EMsoft_BINARY_DIR}/Test ${EMsoft_SOURCE_DIR}/Source/H5Support)
+target_link_libraries(EMEBSDmasterDataTest PUBLIC H5Support)
+message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDmasterDataTest")
+add_test(NAME EMsoft_${test_index}EMEBSDmasterDataTest
+        COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDmasterDataTest${EXE_EXT} ${EMsoft_BINARY_DIR}/DItutorial/Ni/Ni-master-20kV.h5 ${EMsoftData_DIR}/DItutorial/Ni/Output/Ni-master-20kV.h5
+        WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
+        )
+
 # message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDmasterOutputTest")
 # add_test(NAME EMsoft_${test_index}_EMEBSDmasterOutputTest
 #         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDmasterOutputTest${EXE_EXT}
