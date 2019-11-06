@@ -5,7 +5,7 @@
 namespace
 {
 // List the groups that will be used for this test.  The test will check that all groups exist and have the same structure in both files.
-const std::list<std::string> k_H5GroupPaths = {"EMData/EBSDmaster", "EMheader/EBSDmaster"};
+const std::list<std::string> k_H5GroupPaths = {"CrystalData", "EMData/EBSD", "EMheader/EBSD"};
 } // namespace
 
 /**

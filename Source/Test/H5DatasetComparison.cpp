@@ -2,12 +2,6 @@
 
 #include <iomanip>
 
-namespace
-{
-const int k_TableTitleIndent = 65;
-const int k_TableLineLength = 100;
-} // namespace
-
 // -----------------------------------------------------------------------------
 std::string line(int length)
 {
@@ -29,7 +23,7 @@ H5DatasetComparison::H5DatasetComparison(std::string exemplaryFilePath, std::str
 }
 
 // -----------------------------------------------------------------------------
-std::string H5DatasetComparison::getObjectPath(hid_t id, const std::string& objName)
+std::string H5DatasetComparison::generateObjectPath(hid_t id, const std::string& objName)
 {
   std::string objPath = H5Utilities::getObjectPath(id);
   if(objPath.at(objPath.size() - 1) != '/')
@@ -38,17 +32,4 @@ std::string H5DatasetComparison::getObjectPath(hid_t id, const std::string& objN
   }
   objPath.append(objName);
   return objPath;
-}
-
-// -----------------------------------------------------------------------------
-std::string H5DatasetComparison::getOutput() const
-{
-  std::stringstream ss;
-  ss << std::setw(k_TableTitleIndent) << "DATASETS ERROR TABLE\n";
-  ss << line(k_TableLineLength);
-  ss << "HDF5 Path" << k_TableDelimiter << "Comparison Type" << k_TableDelimiter << "Exemplary Type" << k_TableDelimiter << "Test Type" << k_TableDelimiter << "Matching Dims" << k_TableDelimiter
-     << "Matching Data\n";
-  ss << line(k_TableLineLength);
-
-  return ss.str() + m_Output;
 }

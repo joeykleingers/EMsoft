@@ -72,109 +72,15 @@ int main(int argc, char* argv[])
     result = false;
   }
 
-  if(!datasetComparison.compareDataset<char>("EMheader/EBSDmaster/ProgramName"))
+  if(!datasetComparison.compareDataset<std::string>("EMheader/EBSDmaster/ProgramName"))
   {
     result = false;
   }
 
-  if(!datasetComparison.compareDataset<char>("EMheader/EBSDmaster/Version"))
+  if(result)
   {
-    result = false;
+    return EXIT_SUCCESS;
   }
 
-  if(!datasetComparison.compareDataset<char>("NMLfiles/EBSDmasterNML"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<char>("NMLparameters/EBSDMasterNameList/BetheParametersFile"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<int32_t>("NMLparameters/EBSDMasterNameList/Esel"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<int32_t>("NMLparameters/EBSDMasterNameList/combinesites"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<char>("NMLparameters/EBSDMasterNameList/copyfromenergyfile"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<float>("NMLparameters/EBSDMasterNameList/dmin"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<char>("NMLparameters/EBSDMasterNameList/energyfile"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<char>("NMLparameters/EBSDMasterNameList/latgridtype"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<int32_t>("NMLparameters/EBSDMasterNameList/npx"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<int32_t>("NMLparameters/EBSDMasterNameList/nthreads"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<int32_t>("NMLparameters/EBSDMasterNameList/restart"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<int32_t>("NMLparameters/EBSDMasterNameList/stdout"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<int32_t>("NMLparameters/EBSDMasterNameList/uniform"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<float>("NMLparameters/BetheList/c1"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<float>("NMLparameters/BetheList/c2"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<float>("NMLparameters/BetheList/c3"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<float>("NMLparameters/BetheList/sgdbdiff"))
-  {
-    result = false;
-  }
-
-  // Output the results if the test did not pass
-  if(!result)
-  {
-    std::string output = datasetComparison.getOutput();
-    std::cout << output;
-
-    return EXIT_FAILURE;
-  }
-
-  return EXIT_SUCCESS;
+  return EXIT_FAILURE;
 }

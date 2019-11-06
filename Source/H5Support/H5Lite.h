@@ -24,8 +24,8 @@
 #include <hdf5.h>
 
 //-- H5Support Headers
-#include "H5Support/H5Support.h"
 #include "H5Support/H5Macros.h"
+#include "H5Support/H5Support.h"
 
 #ifdef H5Support_USE_MUTEX
 #define H5SUPPORT_MUTEX_LOCK()\
@@ -1147,58 +1147,71 @@ namespace H5Support_NAMESPACE
         {
           return -1;
         }
+        std::string dataTypeStr = H5Lite::StringForHDFType(dataType);
         did = H5Dopen( loc_id, dsetName.c_str(), H5P_DEFAULT);
         if ( did < 0 )
         {
           std::cout << "H5Lite.h::readVectorDataset(" << __LINE__ << ") Error opening Dataset at loc_id (" << loc_id << ") with object name (" << dsetName << ")" << std::endl;
-          return -1;
+          return -2;
         }
-        if ( did >= 0 )
+
+        hid_t typeId = H5Dget_type(did);
+        std::string typeStr = H5Lite::StringForHDFType(typeId);
+        if(dataTypeStr != typeStr)
         {
-          spaceId = H5Dget_space(did);
-          if ( spaceId > 0 )
+          std::cout << "H5Lite.h::readVectorDataset(" << __LINE__ << ") Error reading Dataset at loc_id (" << loc_id << ") with object name (" << dsetName << ").  The storage type (" << dataTypeStr
+                    << ") is different than the dataset type (" << typeStr << ")." << std::endl;
+          err = H5Dclose(did);
+          if(err < 0)
           {
-            int32_t rank = H5Sget_simple_extent_ndims(spaceId);
-            if (rank > 0)
+            std::cout << "Error Closing Dataset" << std::endl;
+          }
+          return -3;
+        }
+
+        spaceId = H5Dget_space(did);
+        if(spaceId > 0)
+        {
+          int32_t rank = H5Sget_simple_extent_ndims(spaceId);
+          if(rank > 0)
+          {
+            std::vector<hsize_t> dims;
+            dims.resize(rank); // Allocate enough room for the dims
+            err = H5Sget_simple_extent_dims(spaceId, &(dims.front()), nullptr);
+            hsize_t numElements = 1;
+            for(std::vector<hsize_t>::iterator iter = dims.begin(); iter < dims.end(); ++iter)
             {
-              std::vector<hsize_t> dims;
-              dims.resize(rank);// Allocate enough room for the dims
-              err = H5Sget_simple_extent_dims(spaceId, &(dims.front()), nullptr);
-              hsize_t numElements = 1;
-              for (std::vector<hsize_t>::iterator iter = dims.begin(); iter < dims.end(); ++iter )
-              {
-                numElements = numElements * (*iter);
-              }
-              // std::cout << "NumElements: " << numElements << std::endl;
-              //Resize the vector
-              data.resize( static_cast<int>(numElements) );
-              // for (uint32_t i = 0; i<numElements; ++i) { data[i] = 55555555;  }
-              err = H5Dread(did, dataType, H5S_ALL, H5S_ALL, H5P_DEFAULT, &( data.front() ) );
-              if (err < 0)
-              {
-                std::cout << "Error Reading Data.'" << dsetName << "'" << std::endl;
-                retErr = err;
-              }
+              numElements = numElements * (*iter);
             }
-            err = H5Sclose(spaceId);
-            if (err < 0 )
+            // std::cout << "NumElements: " << numElements << std::endl;
+            // Resize the vector
+            data.resize(static_cast<int>(numElements));
+            // for (uint32_t i = 0; i<numElements; ++i) { data[i] = 55555555;  }
+            err = H5Dread(did, dataType, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(data.front()));
+            if(err < 0)
             {
-              std::cout << "Error Closing Data Space" << std::endl;
+              std::cout << "Error Reading Data.'" << dsetName << "'" << std::endl;
               retErr = err;
             }
           }
+          err = H5Sclose(spaceId);
+          if(err < 0)
+          {
+            std::cout << "Error Closing Data Space" << std::endl;
+            retErr = err;
+          }
+        }
           else
           {
             std::cout << "Error Opening SpaceID" << std::endl;
             retErr = spaceId;
           }
-          err = H5Dclose( did );
-          if (err < 0 )
+          err = H5Dclose(did);
+          if(err < 0)
           {
             std::cout << "Error Closing Dataset" << std::endl;
             retErr = err;
           }
-        }
         return retErr;
       }
 

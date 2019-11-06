@@ -246,23 +246,31 @@ add_test(NAME EMsoft_${test_index}EMEBSDmasterDataTest
         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
         )
 
-# message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDmasterOutputTest")
-# add_test(NAME EMsoft_${test_index}_EMEBSDmasterOutputTest
-#         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDmasterOutputTest${EXE_EXT}
-#         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
-#         )
-
 # math(EXPR test_index "${test_index} + 1")
 # create_workflow_test( EXE_NAME EMEBSD
 #                       INDEX ${test_index}
 #                       OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
 #                     )
 
-# message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDOutputTest")
-# add_test(NAME EMsoft_${test_index}_EMEBSDOutputTest
-#         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDOutputTest${EXE_EXT}
-#         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
-#         )
+add_executable(EMEBSDStructureTest EMEBSDStructureTest.cpp H5StructureComparison.h H5StructureComparison.cpp ${EMsoft_BINARY_DIR}/Test/TestFileLocations.h)
+target_compile_features(EMEBSDStructureTest PUBLIC cxx_std_11)
+target_include_directories(EMEBSDStructureTest PUBLIC ${EMsoft_BINARY_DIR}/Test ${EMsoft_SOURCE_DIR}/Source/H5Support)
+target_link_libraries(EMEBSDStructureTest PUBLIC H5Support)
+message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDStructureTest")
+add_test(NAME EMsoft_${test_index}EMEBSDStructureTest
+        COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDStructureTest${EXE_EXT} ${EMsoft_BINARY_DIR}/DItutorial/Ni/PatternTest.h5 ${EMsoftData_DIR}/DItutorial/Ni/Output/PatternTest.h5
+        WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
+        )
+
+add_executable(EMEBSDDataTest EMEBSDDataTest.cpp H5DatasetComparison.h H5DatasetComparison.cpp ${EMsoft_BINARY_DIR}/Test/TestFileLocations.h)
+target_compile_features(EMEBSDDataTest PUBLIC cxx_std_11)
+target_include_directories(EMEBSDDataTest PUBLIC ${EMsoft_BINARY_DIR}/Test ${EMsoft_SOURCE_DIR}/Source/H5Support)
+target_link_libraries(EMEBSDDataTest PUBLIC H5Support)
+message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDDataTest")
+add_test(NAME EMsoft_${test_index}EMEBSDDataTest
+        COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDDataTest${EXE_EXT} ${EMsoft_BINARY_DIR}/DItutorial/Ni/PatternTest.h5 ${EMsoftData_DIR}/DItutorial/Ni/Output/PatternTest.h5
+        WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
+        )
 
 # #------------------------------------------------------------------------------
 # # 4: Setup the ADP executable
@@ -272,12 +280,6 @@ add_test(NAME EMsoft_${test_index}EMEBSDmasterDataTest
 #                       OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
 #                     )
 
-# message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMgetADPOutputTest")
-# add_test(NAME EMsoft_${test_index}_EMgetADPOutputTest
-#         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMgetADPOutputTest${EXE_EXT}
-#         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
-#         )
-
 # #------------------------------------------------------------------------------
 # # 5: Setup the EMEBSDDIpreview executable
 # math(EXPR test_index "${test_index} + 1")
@@ -285,12 +287,6 @@ add_test(NAME EMsoft_${test_index}EMEBSDmasterDataTest
 #                       INDEX ${test_index}
 #                       OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
 #                     )
-
-# message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDDIpreviewOutputTest")
-# add_test(NAME EMsoft_${test_index}_EMEBSDDIpreviewOutputTest
-#         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDDIpreviewOutputTest${EXE_EXT}
-#         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
-#         )
 
 # #------------------------------------------------------------------------------
 # # 6: Setup the EMEBSDDIpreview executable
@@ -300,11 +296,15 @@ add_test(NAME EMsoft_${test_index}EMEBSDmasterDataTest
 #                       OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
 #                     )
 
-# message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDDIOutputTest")
-# add_test(NAME EMsoft_${test_index}_EMEBSDDIOutputTest
-#         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDDIOutputTest${EXE_EXT}
-#         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
-#         )
+add_executable(EMEBSDDIDataTest EMEBSDDIDataTest.cpp H5DatasetComparison.h H5DatasetComparison.cpp ${EMsoft_BINARY_DIR}/Test/TestFileLocations.h)
+target_compile_features(EMEBSDDIDataTest PUBLIC cxx_std_11)
+target_include_directories(EMEBSDDIDataTest PUBLIC ${EMsoft_BINARY_DIR}/Test ${EMsoft_SOURCE_DIR}/Source/H5Support)
+target_link_libraries(EMEBSDDIDataTest PUBLIC H5Support)
+message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMEBSDDIDataTest")
+add_test(NAME EMsoft_${test_index}EMEBSDDIDataTest
+        COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMEBSDDIDataTest${EXE_EXT} ${EMsoft_BINARY_DIR}/DItutorial/Ni/dp-Ni6.h5 ${EMsoftData_DIR}/DItutorial/Ni/Output/dp-Ni6.h5
+        WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
+        )
 
 # #------------------------------------------------------------------------------
 # # 7: Setup the EMFitOrientation executable
@@ -313,10 +313,3 @@ add_test(NAME EMsoft_${test_index}EMEBSDmasterDataTest
 #                       INDEX ${test_index}
 #                       OUTPUT_DIR ${EMsoft_NML_TEST_DIR}
 #                     )
-
-# message(STATUS "Adding Unit Test: EMsoft_${test_index}_EMFitOrientationOutputTest")
-# add_test(NAME EMsoft_${test_index}_EMFitOrientationOutputTest
-#         COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/EMFitOrientationOutputTest${EXE_EXT}
-#         WORKING_DIRECTORY ${EMsoft_NML_TEST_DIR}
-#         )
-

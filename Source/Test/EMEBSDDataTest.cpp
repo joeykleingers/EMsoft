@@ -1,7 +1,7 @@
 #include "H5DatasetComparison.h"
 
 /**
- * @brief main This test will check the output of the EMMCOpenCL program against an exemplary
+ * @brief main This test will check the output of the EMEBSDmaster program against an exemplary
  * @param argc
  * @param argv
  * @return
@@ -67,42 +67,17 @@ int main(int argc, char* argv[])
     result = false;
   }
 
-  if(!datasetComparison.compareDataset<float>("EMData/MCOpenCL/accumSP"))
+  if(!datasetComparison.compareDataset<float>("EMData/EBSD/EBSDPatterns", 0.002))
   {
     result = false;
   }
 
-  if(!datasetComparison.compareDataset<int32_t>("EMData/MCOpenCL/accum_e"))
+  if(!datasetComparison.compareDataset<float>("EMData/EBSD/EulerAngles", 0.001))
   {
     result = false;
   }
 
-  if(!datasetComparison.compareDataset<int32_t>("EMData/MCOpenCL/accum_z"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<int32_t>("EMData/MCOpenCL/multiplier"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<int32_t>("EMData/MCOpenCL/numEbins"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<int32_t>("EMData/MCOpenCL/numzbins"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<int32_t>("EMData/MCOpenCL/totnum_el"))
-  {
-    result = false;
-  }
-
-  if(!datasetComparison.compareDataset<std::string>("EMheader/MCOpenCL/ProgramName"))
+  if(!datasetComparison.compareDataset<int32_t>("EMData/EBSD/numangles"))
   {
     result = false;
   }
