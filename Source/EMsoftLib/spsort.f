@@ -1307,7 +1307,7 @@ C   900510  Changed calling sequence to include LIBRARY and SUBROUTINE
 C           names, changed routine name from XERCTL to XERCNT.  (RWC)
 C   920501  Reformatted the REFERENCES section.  (WRB)
 C***END PROLOGUE  XERCNT
-      CHARACTER*(*) LIBRAR, SUBROU, MESSG
+      CHARACTER(LEN = *) LIBRAR, SUBROU, MESSG
 C***FIRST EXECUTABLE STATEMENT  XERCNT
       RETURN
       END
@@ -1346,7 +1346,7 @@ C   900510  Changed calling sequence to delete length of character
 C           and changed routine name from XERABT to XERHLT.  (RWC)
 C   920501  Reformatted the REFERENCES section.  (WRB)
 C***END PROLOGUE  XERHLT
-      CHARACTER*(*) MESSG
+      CHARACTER(LEN = *) MESSG
 C***FIRST EXECUTABLE STATEMENT  XERHLT
       STOP
       END
@@ -1403,7 +1403,7 @@ C             substrings of characters to construct the error message.
 C             Here is an example showing the use of both writing to
 C             an internal file and catenating character strings.
 C
-C                   CHARACTER*5 CHARN, CHARL
+C                   CHARACTER(LEN = 5) CHARN, CHARL
 C                   WRITE (CHARN,10) N
 C                   WRITE (CHARL,10) LDA
 C                10 FORMAT(I5)
@@ -1536,10 +1536,10 @@ C           LEVEL=-1 logic, changed calls to XERSAV to XERSVE, and
 C           XERCTL to XERCNT.  (RWC)
 C   920501  Reformatted the REFERENCES section.  (WRB)
 C***END PROLOGUE  XERMSG
-      CHARACTER*(*) LIBRAR, SUBROU, MESSG
-      CHARACTER*8 XLIBR, XSUBR
-      CHARACTER*72  TEMP
-      CHARACTER*20  LFIRST
+      CHARACTER(LEN = *) LIBRAR, SUBROU, MESSG
+      CHARACTER(LEN = 8) XLIBR, XSUBR
+      CHARACTER(LEN = 72)  TEMP
+      CHARACTER(LEN = 20)  LFIRST
 C***FIRST EXECUTABLE STATEMENT  XERMSG
       LKNTRL = J4SAVE (2, 0, .FALSE.)
       MAXMES = J4SAVE (4, 0, .FALSE.)
@@ -1790,11 +1790,11 @@ C   891214  Prologue converted to Version 4.0 format.  (WRB)
 C   900510  Added code to break messages between words.  (RWC)
 C   920501  Reformatted the REFERENCES section.  (WRB)
 C***END PROLOGUE  XERPRN
-      CHARACTER*(*) PREFIX, MESSG
+      CHARACTER(LEN = *) PREFIX, MESSG
       INTEGER NPREF, NWRAP
-      CHARACTER*148 CBUFF
+      CHARACTER(LEN = 148) CBUFF
       INTEGER IU(5), NUNIT
-      CHARACTER*2 NEWLIN
+      CHARACTER(LEN = 2) NEWLIN
       PARAMETER (NEWLIN = '$$')
 C***FIRST EXECUTABLE STATEMENT  XERPRN
       CALL XGETUA(IU,NUNIT)
@@ -2003,9 +2003,9 @@ C   920501  Reformatted the REFERENCES section.  (WRB)
 C***END PROLOGUE  XERSVE
       PARAMETER (LENTAB=10)
       INTEGER LUN(5)
-      CHARACTER*(*) LIBRAR, SUBROU, MESSG
-      CHARACTER*8  LIBTAB(LENTAB), SUBTAB(LENTAB), LIB, SUB
-      CHARACTER*20 MESTAB(LENTAB), MES
+      CHARACTER(LEN = *) LIBRAR, SUBROU, MESSG
+      CHARACTER(LEN = 8)  LIBTAB(LENTAB), SUBTAB(LENTAB), LIB, SUB
+      CHARACTER(LEN = 20) MESTAB(LENTAB), MES
       DIMENSION NERTAB(LENTAB), LEVTAB(LENTAB), KOUNT(LENTAB)
       SAVE LIBTAB, SUBTAB, MESTAB, NERTAB, LEVTAB, KOUNT, KOUNTX, NMSG
       DATA KOUNTX/0/, NMSG/0/
