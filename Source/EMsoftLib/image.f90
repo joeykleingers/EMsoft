@@ -108,6 +108,16 @@ module image
 
   private
   public :: image_t
+  integer(int16) :: boz_i16 = int(z'0100', kind=kind(boz_i16))
+  integer(int32) :: boz_i32_1 = int(z'00000100', kind=kind(boz_i32_1))
+  integer(int32) :: boz_i32_2 = int(z'00010000', kind=kind(boz_i32_2))
+  integer(int64) :: boz_i64_1 = int(z'0000000000000100', kind=kind(boz_i64_1))
+  integer(int64) :: boz_i64_2 = int(z'0000000000010000', kind=kind(boz_i64_2))
+  integer(int64) :: boz_i64_3 = int(z'0000000100000000', kind=kind(boz_i64_3))
+  real(real32) :: boz_r32_1 = real(z'00000100', kind=kind(boz_r32_1))
+  real(real32) :: boz_r32_2 = real(z'00010000', kind=kind(boz_r32_2))
+  real(real64) :: boz_r64_1 = real(z'0000000000010000', kind=kind(boz_r64_1))
+  real(real64) :: boz_r64_2 = real(z'0000000100000000', kind=kind(boz_r64_2))
 
   ! enumeration of allowed pixel data types
   enum, bind(c)
@@ -682,7 +692,7 @@ contains
       case(pix_i8 )
         allocate(data(this%size()))
         data = image_get_i8 (this) ! cast from i8  => i16
-        if(this%unsigned) where(data.lt.0) data = data+z'0100' ! handle unsigned => signed
+        if(this%unsigned) where(data.lt.0) data = data+boz_i16 ! handle unsigned => signed
       case(pix_i16)
         allocate(data(this%size()))
         data = transfer(this%buff, data)
@@ -704,11 +714,11 @@ contains
       case(pix_i8 )
         allocate(data(this%size()))
         data = image_get_i8 (this) ! cast from i8  => i32
-        if(this%unsigned) where(data.lt.0) data = data+z'00000100' ! handle unsigned => signed
+        if(this%unsigned) where(data.lt.0) data = data+boz_i32_1 ! handle unsigned => signed
       case(pix_i16)
         allocate(data(this%size()))
         data = image_get_i16(this) ! cast from i16 => i32
-        if(this%unsigned) where(data.lt.0) data = data+z'00010000' ! handle unsigned => signed
+        if(this%unsigned) where(data.lt.0) data = data+boz_i32_2 ! handle unsigned => signed
       case(pix_i32)
         allocate(data(this%size()))
         data = transfer(this%buff, data)
@@ -730,15 +740,15 @@ contains
       case(pix_i8 )
         allocate(data(this%size()))
         data = image_get_i8 (this) ! cast from i8  => i64
-        if(this%unsigned) where(data.lt.0) data = data+z'0000000000000100' ! handle unsigned => signed
+        if(this%unsigned) where(data.lt.0) data = data+boz_i64_1 ! handle unsigned => signed
       case(pix_i16)
         allocate(data(this%size()))
         data = image_get_i16(this) ! cast from i16 => i64
-        if(this%unsigned) where(data.lt.0) data = data+z'0000000000010000' ! handle unsigned => signed
+        if(this%unsigned) where(data.lt.0) data = data+boz_i64_2 ! handle unsigned => signed
       case(pix_i32)
         allocate(data(this%size()))
         data = image_get_i32(this) ! cast from i32 => i64
-        if(this%unsigned) where(data.lt.0) data = data+z'0000000100000000' ! handle unsigned => signed
+        if(this%unsigned) where(data.lt.0) data = data+boz_i64_3 ! handle unsigned => signed
       case(pix_i64)
         allocate(data(this%size()))
         data = transfer(this%buff, data)
@@ -760,11 +770,11 @@ contains
       case(pix_i8 )
         allocate(data(this%size()))
         data = image_get_i8 (this) ! cast from i8  => r32
-        if(this%unsigned) where(data.lt.0) data = data+z'00000100' ! handle unsigned => signed
+        if(this%unsigned) where(data.lt.0) data = data+boz_r32_1 ! handle unsigned => signed
       case(pix_i16)
         allocate(data(this%size()))
         data = image_get_i16(this) ! cast from i16 => r32
-        if(this%unsigned) where(data.lt.0) data = data+z'00010000' ! handle unsigned => signed
+        if(this%unsigned) where(data.lt.0) data = data+boz_r32_2 ! handle unsigned => signed
       case(pix_r32)
         allocate(data(this%size()))
         data = transfer(this%buff, data)
@@ -786,11 +796,11 @@ contains
       case(pix_i8 )
         allocate(data(this%size()))
         data = image_get_i8 (this) ! cast from i8  => r64
-        if(this%unsigned) where(data.lt.0) data = data+z'0000000000010000' ! handle unsigned => signed
+        if(this%unsigned) where(data.lt.0) data = data+boz_r64_1 ! handle unsigned => signed
       case(pix_i16)
         allocate(data(this%size()))
         data = image_get_i16(this) ! cast from i16 => r64
-        if(this%unsigned) where(data.lt.0) data = data+z'0000000100000000' ! handle unsigned => signed
+        if(this%unsigned) where(data.lt.0) data = data+boz_r64_2 ! handle unsigned => signed
       case(pix_i32)
         allocate(data(this%size()))
         data = image_get_i32(this) ! cast from i32 => r64
