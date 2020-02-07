@@ -618,7 +618,8 @@ type symdata2D
 end type symdata2D
 
 ! finally, we define the rotational crystal symmetry operators in terms of quaternions (q0, q1,q2,q3) with q0 the scalar part;
-! these are used in the dictmod EBSD dictionary indexing module, and are defined with respect to the standard cartesian reference frame
+! these are used in the dictmod EBSD dictionary indexing module, and are defined with respect to the standard cartesian
+! reference frame
 real(kind=dbl),dimension(4,152) :: SYM_Qsymop = reshape( (/ &
                                 1.D0, 0.D0, 0.D0, 0.D0, &       ! 1: identity operator
                                 0.D0, 1.D0, 0.D0, 0.D0, &       ! 2: 180@[100]
@@ -655,7 +656,9 @@ real(kind=dbl),dimension(4,152) :: SYM_Qsymop = reshape( (/ &
                                 0.D0, 0.D0, 1.D0, 0.D0, &       !33: 180@[010]
                                 0.D0,-half, sq32, 0.D0, &       !34: 180@[xxx]
                                 0.D0,-sq32, half, 0.D0, &       !35: 180@[xxx]
-                                1.0000000000000000D0, 0.00000000000000000D0, 0.00000000000000000D0, 0.00000000000000000D0, & ! icosahedral operators
+
+                                ! icosahedral operators
+                                1.0000000000000000D0, 0.00000000000000000D0, 0.00000000000000000D0, 0.00000000000000000D0, &
                                 0.0000000000000000D0, 0.68819093704223555D0, 0.50000000000000000D0, 0.52573108673095648D0, &
                                 0.0000000000000000D0,-0.26286554336547824D0, 0.80901700258254916D0, 0.52573108673095648D0, &
                                 0.0000000000000000D0,-0.85065078735351463D0, 0.00000000000000000D0, 0.52573108673095648D0, &
@@ -1315,8 +1318,12 @@ end type BetheParameterType
 type STEMtype
         integer(kind=irg)               :: numk
         real(kind=sgl)                  :: BFmrad,ADFimrad,ADFomrad, diffapmrad, diffapmcenter
-        logical,allocatable             :: ZABFweightsarray(:,:,:),ZAADFweightsarray(:,:,:)       ! only used for the zone axis case
-        real(kind=sgl),allocatable      :: sgarray(:,:),BFweightsarray(:,:,:),ADFweightsarray(:,:,:)   ! only used for the systematic row case
+
+        ! only used for the zone axis case
+        logical,allocatable             :: ZABFweightsarray(:,:,:),ZAADFweightsarray(:,:,:)
+
+        ! only used for the systematic row case
+        real(kind=sgl),allocatable      :: sgarray(:,:),BFweightsarray(:,:,:),ADFweightsarray(:,:,:)
 end type STEMtype
 
 !--------------------------------------------------------------------------
@@ -1422,12 +1429,12 @@ end type FZpointd
 
 ! type definition for linked list in substrate Bloch wave calculations
 type substrateBW
-        integer(kind=irg)               :: NSg          ! number of strong substrate reflections for this film g-vector
-        real(kind=sgl)                  :: kg(3)        ! incident reciprocal wave vector for particular g in substrate reference frame
-        integer(kind=irg),allocatable   :: hg(:,:)      ! reciprocal lattice point list for substrate (hg(3,NSg))
-        complex(kind=dbl),allocatable   :: Gammam(:)    ! Gamma eigenvalues of dynamical matrix
-        complex(kind=dbl),allocatable   :: Dmg(:,:)     ! Bloch wave coefficients (they already include the beta^(m) excitation amplitudes)
-        type(substrateBW),pointer       :: nextg        ! pointer to next entry in list
+        integer(kind=irg)               :: NSg       ! number of strong substrate reflections for this film g-vector
+        real(kind=sgl)                  :: kg(3)     ! incident reciprocal wave vector for particular g in substrate reference frame
+        integer(kind=irg),allocatable   :: hg(:,:)   ! reciprocal lattice point list for substrate (hg(3,NSg))
+        complex(kind=dbl),allocatable   :: Gammam(:) ! Gamma eigenvalues of dynamical matrix
+        complex(kind=dbl),allocatable   :: Dmg(:,:)  ! Bloch wave coefficients (they already include the beta^(m) excitation amplitudes)
+        type(substrateBW),pointer       :: nextg     ! pointer to next entry in list
 end type substrateBW
 
 
@@ -1444,7 +1451,7 @@ type dicttype
         real(kind=dbl),allocatable      :: xAp(:)       ! kappa array
         real(kind=dbl),allocatable      :: yAp(:)       ! A_4(u) lookup table
         integer(kind=irg)               :: Apnum        ! number of entries in lookup table
-        integer(kind=irg)               :: Num_of_init  ! number of times that the EM algorithm needs to be carried out (set by user)
+        integer(kind=irg)               :: Num_of_init  ! number of times that EM algorithm needs to be carried out (set by user)
         integer(kind=irg)               :: Num_of_iterations    ! number of iterations inside each EM call (set by user)
 end type dicttype
 
@@ -1681,7 +1688,10 @@ type MRCstruct
     integer(kind=ish)       :: nsymbt = 0 ! NOT SURE WHAT THIS IS
     integer(kind=irg)       :: next = 131072 ! number of bytes in extended header (1024 * 128 for FEI)
     integer(kind=ish)       :: creatid = 0 ! used to be an ID number, is 0 as of IMOD 4.2.23
-    character(30)           :: extra_data = '00                            ' ! string(' ',format='(A30)'), not used, first two bytes should be 0
+
+    ! string(' ',format='(A30)'), not used, first two bytes should be 0
+    character(30)           :: extra_data = '00                            '
+
     integer(kind=ish)       :: numint = 0 ! number of bytes per section (SerialEM interpretation) [renamed from nint to numin]
     integer(kind=ish)       :: nreal = 32 ! bit flags for short data type
     character(20)           :: extra_data_2= '                    ' ! string(' ',format='(A20)'), $ ; not used
@@ -1920,7 +1930,7 @@ end type EBSDLargeAccumDIType
 
 type EBSDMasterDIType
         real(kind=sgl),allocatable      :: mLPNH(:,:,:) , mLPSH(:,:,:)
-        real(kind=sgl),allocatable      :: rgx(:,:), rgy(:,:), rgz(:,:)          ! auxiliary detector arrays needed for interpolation
+        real(kind=sgl),allocatable      :: rgx(:,:), rgy(:,:), rgz(:,:)  ! auxiliary detector arrays needed for interpolation
 end type EBSDMasterDIType
         
 type EBSDDIdataType
