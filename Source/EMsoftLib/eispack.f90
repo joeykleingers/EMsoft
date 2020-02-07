@@ -4626,7 +4626,13 @@ subroutine comqr2 ( n, low, igh, ortr, orti, hr, hi, wr, wi, zr, zi, ierr )
 !  left by CORTH.
 !
   iend = igh - low - 1
-  if ( iend ) 180, 150, 105
+  if(iend < 0) then
+    go to 180
+  else if (iend == 0) then
+    go to 150
+  else
+    go to 105
+  end if
 
 105 continue
 
@@ -6896,7 +6902,13 @@ subroutine hqr2 ( n, low, igh, h, wr, wi, z, ierr )
      p = wr(en)
      q = wi(en)
      na = en - 1
-     if ( q ) 710, 600, 800
+     if(q < 0) then
+       go to 710
+     else if (q == 0) then
+       go to 600
+     else
+       go to 800
+     end if
 !
 !  Real vector
 !
@@ -11381,7 +11393,12 @@ subroutine qzvec ( n, a, b, alfr, alfi, beta, z )
         d = dr * rr + di
         t1 = ( tr * rr + ti ) / d
         t2 = ( ti * rr - tr ) / d
-        go to ( 787, 782 ), isw
+        select case (isw)
+        case(1)
+          go to 787
+        case(2)
+         go to 782
+        end select
 !
 !  Complex 2-by-2 block.
 !
@@ -16519,7 +16536,13 @@ subroutine tridib ( n, eps1, d, e, e2, lb, ub, m11, m, w, ind, ierr )
 
 60 continue
 
-  if ( s - m1 ) 65, 73, 70
+  if(s - m1 < 0) then
+    go to 65
+  else if (s - m1 == 0) then
+    go to 73
+  else
+    go to 70
+  end if
 
 65 continue
 
@@ -16546,7 +16569,13 @@ subroutine tridib ( n, eps1, d, e, e2, lb, ub, m11, m, w, ind, ierr )
 
 80 continue
 
-   if ( s - m22 ) 65, 85, 70
+   if(s - m22 < 0) then
+     go to 65
+   else if (s - m22 == 0) then
+     go to 85
+   else
+     go to 70
+   end if
 
 85 continue
 
@@ -16687,7 +16716,18 @@ subroutine tridib ( n, eps1, d, e, e2, lb, ub, m11, m, w, ind, ierr )
 
      end do
 
-     go to (60,80,200,220,360), isturm
+     select case (isturm)
+     case(1)
+       go to 60
+     case(2)
+      go to 80
+      case(3)
+        go to 200
+      case(4)
+       go to 220
+       case(5)
+         go to 360
+     end select
 !
 !  Refine intervals.
 !
@@ -17100,7 +17140,18 @@ subroutine tsturm ( n, eps1, d, e, e2, lb, ub, mm, m, w, z, ierr )
 
      end do
 
-     go to ( 60,80,200,220,360 ), isturm
+     select case (isturm)
+     case(1)
+       go to 60
+     case(2)
+      go to 80
+      case(3)
+        go to 200
+      case(4)
+       go to 220
+       case(5)
+         go to 360
+     end select
 !
 !  Refine intervals.
 !
