@@ -1602,7 +1602,18 @@ subroutine bisect ( n, eps1, d, e, e2, lb, ub, mm, m, w, ind, ierr )
 
      end do
 
-     go to (60,80,200,220,360), isturm
+     select case (isturm)
+     case(1)
+       go to 60
+     case(2)
+      go to 80
+     case(3)
+      go to 200
+     case(4)
+      go to 220
+     case(5)
+      go to 360
+     end select
 !
 !  Refine intervals.
 !
@@ -11357,7 +11368,12 @@ subroutine qzvec ( n, a, b, alfr, alfi, beta, z )
         d = dr + di * rr
         t1 = (tr + ti * rr) / d
         t2 = (ti - tr * rr) / d
-        go to ( 787, 782 ), isw
+        select case (isw)
+        case(1)
+          go to 787
+        case(2)
+         go to 782
+        end select
 
 777     continue
 
